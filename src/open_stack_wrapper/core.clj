@@ -53,7 +53,9 @@
 
   )
 
-(defn get-response-body [response] (json/read-str (:body response) :key-fn keyword))
+(defn get-response-body
+  "having a json-string response  obtain the body on json format"
+  [response] (json/read-str (:body response) :key-fn keyword))
 
 (defn get-token-id[response-body-json] (-> response-body-json :access :token :id))
 
@@ -67,9 +69,40 @@
 (defn store-strutctured-endpoints [data]
   (let [services (get-in data [:access :serviceCatalog])]
     (reduce
-         (fn [c it]
-           (let [first-endpoint (first (:endpoints it))]
-             (assoc c (keyword (:type  it)) {:name (:name it) :id (:id first-endpoint) :publicURL (:publicURL first-endpoint)}
-                    ) )) {}  services)))
+     (fn [c it]
+       (let [first-endpoint (first (:endpoints it))]
+         (assoc c
+           (keyword (:type  it))
+           {:name (:name it)
+            :id (:id first-endpoint)
+            :publicURL (:publicURL first-endpoint)}))) {}  services)))
+(comment "having endpoints give me 'compute'"
+         (:compute (store-strutctured-endpoints endpoints-mock)))
 
-(:compute (store-strutctured-endpoints endpoints-mock))
+(client/get url
+                  {:headers {"X-Auth-Token" t1}
+                   :content-type :json
+                   :socket-timeout 2000              ;; in milliseconds
+                   :conn-timeout 2000                ;; in milliseconds
+                   :accept :json})
+
+((fn [token service-type path]
+
+   (let [
+         ep (endpoints "facebook1428467850")
+         ep2 (get-response-body ep)
+         token-id (get-in ep2 [:access :token :id])
+         publicURL (get-in  (store-strutctured-endpoints ep2) [  :compute :publicURL] )
+         url (str publicURL "/" (name path) )]
+
+
+     (client/get url
+                  {:headers {"X-Auth-Token" token-id}
+                   :content-type :json
+                   :socket-timeout 2000              ;; in milliseconds
+                   :conn-timeout 2000                ;; in milliseconds
+                   :accept :json})
+
+
+     )
+   ) "" :compute :images)
