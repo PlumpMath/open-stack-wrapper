@@ -80,16 +80,16 @@
          (:compute (store-strutctured-endpoints endpoints-mock)))
 
 (client/get url
-                  {:headers {"X-Auth-Token" t1}
-                   :content-type :json
-                   :socket-timeout 2000              ;; in milliseconds
-                   :conn-timeout 2000                ;; in milliseconds
-                   :accept :json})
+            {:headers {"X-Auth-Token" t1}
+             :content-type :json
+             :socket-timeout 2000              ;; in milliseconds
+             :conn-timeout 2000                ;; in milliseconds
+             :accept :json})
 
-((fn [token service-type path]
+((fn [tenant-name service-type path]
 
    (let [
-         ep (endpoints "facebook1428467850")
+         ep (endpoints tenant-name)
          ep2 (get-response-body ep)
          token-id (get-in ep2 [:access :token :id])
          publicURL (get-in  (store-strutctured-endpoints ep2) [  :compute :publicURL] )
@@ -97,12 +97,12 @@
 
 
      (client/get url
-                  {:headers {"X-Auth-Token" token-id}
-                   :content-type :json
-                   :socket-timeout 2000              ;; in milliseconds
-                   :conn-timeout 2000                ;; in milliseconds
-                   :accept :json})
+                 {:headers {"X-Auth-Token" token-id}
+                  :content-type :json
+                  :socket-timeout 2000              ;; in milliseconds
+                  :conn-timeout 2000                ;; in milliseconds
+                  :accept :json})
 
 
      )
-   ) "" :compute :images)
+   ) "facebook1428467850" :compute :images)
