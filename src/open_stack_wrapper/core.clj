@@ -1,5 +1,6 @@
 (ns open-stack-wrapper.core
-  (:use [open-stack-wrapper.util])
+  (:use [open-stack-wrapper.util]
+        [open-stack-wrapper.mock])
   (:require [clj-http.client :as client]
             [clojure.data.json :as json])
   )
@@ -55,3 +56,20 @@
 (defn get-response-body [response] (json/read-str (:body response) :key-fn keyword))
 
 (defn get-token-id[response-body-json] (-> response-body-json :access :token :id))
+
+
+(defn get-token-id [data]
+  (get-in data [:access :token :id]))
+
+(comment
+  (pprint-json-scheme endpoints-mock))
+
+(defn store-strutctured-endpoints [data]
+  (let [services (get-in data [:access :serviceCatalog])]
+    (reduce
+         (fn [c it]
+           (let [first-endpoint (first (:endpoints it))]
+             (assoc c (keyword (:type  it)) {:name (:name it) :id (:id first-endpoint) :publicURL (:publicURL first-endpoint)}
+                    ) )) {}  services)))
+
+(:compute (store-strutctured-endpoints endpoints-mock))

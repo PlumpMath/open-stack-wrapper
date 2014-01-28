@@ -31,11 +31,15 @@
                                                [k   (into {} (rr v))]
                                                )
                                              (if (vector? v)
-                                               [k  (vec (map rr v))]
+                                               (if (empty? v)
+                                                 [k []]
+                                                 [k  [(rr (first v))]]
+                                                 )
+
                                                [k  (keywordize v)]
                                                ))) ex)))
             (if (vector? ex)
-              (vec (map rr ex))
+              [(rr (first ex))]
               (keywordize ex)
               )
 
