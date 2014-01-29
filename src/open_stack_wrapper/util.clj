@@ -23,6 +23,7 @@
               (map? jsondata) (into {} (vec
                                   (map (fn [[json-key json-value]]
                                          (cond
+                                          (nil? json-value) [json-key "nil"]
                                           (map? json-value) (if (empty? json-value) [json-key (keywordize {})] [json-key   (into {} (deep-read json-value))])
                                           (vector? json-value) (if (empty? json-value) [json-key []] [json-key [(deep-read (first json-value))]])
                                           :else [json-key (keywordize json-value)])) jsondata)))
