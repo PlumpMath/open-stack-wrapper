@@ -47,7 +47,7 @@
 
   (pprint-json-scheme endpoints-mock))
 
-(defn store-structured-endpoints [data]
+(defn structured-endpoints [data]
   "in this development state we take the first endpoint available on each service"
   (let [services (get-in data [:access :serviceCatalog])]
     (reduce
@@ -61,12 +61,12 @@
      services)))
 
 (comment "having endpoints give me 'compute' endpoints"
-         (:compute (store-strutctured-endpoints endpoints-mock)))
+         (:compute (structured-endpoints endpoints-mock)))
 
 (defn operation  [tenant-name service-type path]
   (let [eps (endpoints tenant-name)
         token-id (get-in eps [:access :token :id])
-        publicURL (get-in  (store-structured-endpoints eps) [service-type :publicURL] )
+        publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
         url (str publicURL "/" (name path) )]
     (handler/adapt-call (client/get url
                             {:headers {"X-Auth-Token" token-id}
