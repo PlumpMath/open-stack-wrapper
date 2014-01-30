@@ -7,12 +7,12 @@
   )
 
 
-(defn tokens []
+(defn tokens [username password]
   (handler/adapt-call (client/post "http://8.21.28.222:5000/v2.0/tokens"
                            {:body (json/write-str {:auth
                                                    {:passwordCredentials
-                                                    {:username "facebook1428467850"
-                                                     :password "3a34gc72"}}})
+                                                    {:username username
+                                                     :password password}}})
                                         ;   :body "{\"json\": \"input\"}"
                                         ;   :headers {"X-Api-Version" "2"}
                             :content-type :json
@@ -29,11 +29,11 @@
                 :accept :json}))
   )
 
-(defn endpoints [tenant-name]
+(defn endpoints [username password tenant-name]
   (handler/adapt-call (client/post "http://8.21.28.222:5000/v2.0/tokens"
                 {
-                 :body (json/write-str {:auth  {:passwordCredentials {:username "facebook1428467850"
-                                                                      :password "3a34gc72"}
+                 :body (json/write-str {:auth  {:passwordCredentials {:username username
+                                                                      :password password}
                                                 :tenantName tenant-name}})
                                         ;   :body "{\"json\": \"input\"}"
                                         ;   :headers {"X-Api-Version" "2"}
@@ -63,8 +63,8 @@
 (comment "having endpoints give me 'compute' endpoints"
          (:compute (structured-endpoints endpoints-mock)))
 
-(defn operation  [tenant-name service-type path]
-  (let [eps (endpoints tenant-name)
+(defn operation  [username password tenant-name service-type path]
+  (let [eps (endpoints username password tenant-name)
         token-id (get-in eps [:access :token :id])
         publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
         url (str publicURL "/" (name path) )]
@@ -76,5 +76,5 @@
                              :accept :json}))))
 
 (comment "get :compute :images of _tenant_selected"
-  (operation "facebook1428467850" :compute :images)
+  (operation "facebook1428467850" "3a34gc72":compute :images)
   )
