@@ -6,46 +6,55 @@
   )
 
 
-(defn get-error [ex]
-  (let [data-ex (.getData ex)]
-    (json/read-str (get-in data-ex [:object :body]) :key-fn keyword))
-  )
+(defn manage-error [e]
+  (let [get-error (let [data-ex (.getData e)]
+                    (json/read-str (get-in data-ex [:object :body]) :key-fn keyword))
+        error (:error get-error)]
+    (str (:title error) ". " (:message error) " Code:" (:code error))))
+
+(defn get-response-body
+  "having a json-string response  obtain the body on json format"
+  [response] (json/read-str (:body response) :key-fn keyword))
+
+(defmacro adapt-call [body]
+  `(try
+    (get-response-body ~body)
+    (catch clojure.lang.ExceptionInfo e# (manage-error e#))))
 
 (defn tokens []
-  (try
-    (client/post "http://8.21.28.222:5000/v2.0/tokens"
-                 {
-                  :body (json/write-str {:auth  {:passwordCredentials {:username "facebook142846785"
-                                                                       :password "3a34gc72"}}})
+  (adapt-call (client/post "http://8.21.28.222:5000/v2.0/tokens"
+                           {:body (json/write-str {:auth
+                                                   {:passwordCredentials
+                                                    {:username "facebook1428467850"
+                                                     :password "3a34gc72"}}})
                                         ;   :body "{\"json\": \"input\"}"
                                         ;   :headers {"X-Api-Version" "2"}
-                  :content-type :json
-                  :socket-timeout 2000 ;; in milliseconds
-                  :conn-timeout 2000   ;; in milliseconds
-                  :accept :json})
-        (catch clojure.lang.ExceptionInfo e (get-error e))))
+                            :content-type :json
+                            :socket-timeout 2000 ;; in milliseconds
+                            :conn-timeout 2000 ;; in milliseconds
+                            :accept :json})))
 
 (defn tenants [token]
-  (client/get "http://8.21.28.222:5000/v2.0/tenants"
-              {:headers {"X-Auth-Token" token}
-               :content-type :json
-               :socket-timeout 2000 ;; in milliseconds
-               :conn-timeout 2000   ;; in milliseconds
-               :accept :json})
-  )
-
-(defn endpoints [tenant-name]
-  (client/post "http://8.21.28.222:5000/v2.0/tokens"
-               {
-                :body (json/write-str {:auth  {:passwordCredentials {:username "facebook1428467850"
-                                                                     :password "3a34gc72"}
-                                               :tenantName tenant-name}})
-                                        ;   :body "{\"json\": \"input\"}"
-                                        ;   :headers {"X-Api-Version" "2"}
+  (adapt-call (client/get "http://8.21.28.222:5000/v2.0/tenants"
+               {:headers {"X-Auth-Token" token}
                 :content-type :json
                 :socket-timeout 2000 ;; in milliseconds
                 :conn-timeout 2000   ;; in milliseconds
-                :accept :json})
+                :accept :json}))
+  )
+
+(defn endpoints [tenant-name]
+  (adapt-call (client/post "http://8.21.28.222:5000/v2.0/tokens"
+                {
+                 :body (json/write-str {:auth  {:passwordCredentials {:username "facebook1428467850"
+                                                                      :password "3a34gc72"}
+                                                :tenantName tenant-name}})
+                                        ;   :body "{\"json\": \"input\"}"
+                                        ;   :headers {"X-Api-Version" "2"}
+                 :content-type :json
+                 :socket-timeout 2000 ;; in milliseconds
+                 :conn-timeout 2000   ;; in milliseconds
+                 :accept :json}))
   )
 
 (defn process-endpoints [eps-json]
@@ -55,9 +64,7 @@
 
   )
 
-(defn get-response-body
-  "having a json-string response  obtain the body on json format"
-  [response] (json/read-str (:body response) :key-fn keyword))
+
 
 (defn get-token-id[response-body-json] (-> response-body-json :access :token :id))
 
@@ -65,10 +72,11 @@
 (defn get-token-id [data]
   (get-in data [:access :token :id]))
 
-(comment
+(comment   "pprinting data"
+
   (pprint-json-scheme endpoints-mock))
 
-(defn store-strutctured-endpoints [data]
+(defn store-structured-endpoints [data]
   (let [services (get-in data [:access :serviceCatalog])]
     (reduce
      (fn [c it]
@@ -78,33 +86,30 @@
            {:name (:name it)
             :id (:id first-endpoint)
             :publicURL (:publicURL first-endpoint)}))) {}  services)))
-(comment "having endpoints give me 'compute'"
+
+(comment "having endpoints give me 'compute' endpoints"
          (:compute (store-strutctured-endpoints endpoints-mock)))
 
-#_(client/get url
-            {:headers {"X-Auth-Token" t1}
-             :content-type :json
-             :socket-timeout 2000              ;; in milliseconds
-             :conn-timeout 2000                ;; in milliseconds
-             :accept :json})
+(defn operation  [tenant-name service-type path]
+  (let [
+        ep2 (endpoints tenant-name)
 
-((fn [tenant-name service-type path]
+        token-id (get-in ep2 [:access :token :id])
+        publicURL (get-in  (store-structured-endpoints ep2) [service-type :publicURL] )
+        url (str publicURL "/" (name path) )]
 
-   (let [
-         ep (endpoints tenant-name)
-         ep2 (get-response-body ep)
-         token-id (get-in ep2 [:access :token :id])
-         publicURL (get-in  (store-strutctured-endpoints ep2) [  :compute :publicURL] )
-         url (str publicURL "/" (name path) )]
-
-
-     (client/get url
-                 {:headers {"X-Auth-Token" token-id}
-                  :content-type :json
-                  :socket-timeout 2000              ;; in milliseconds
-                  :conn-timeout 2000                ;; in milliseconds
-                  :accept :json})
+    (adapt-call (client/get url
+                            {:headers {"X-Auth-Token" token-id}
+                             :content-type :json
+                             :socket-timeout 2000 ;; in milliseconds
+                             :conn-timeout 2000   ;; in milliseconds
+                             :accept :json}))
 
 
-     )
-   ) "facebook1428467850" :compute :images)
+    )
+  )
+
+(comment "get :compute :images of _tenant_selected"
+
+  (operation "facebook1428467850" :compute :images)
+  )
