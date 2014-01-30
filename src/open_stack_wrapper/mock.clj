@@ -13,3 +13,9 @@
 )
 
 (def tenant-data-mock {:description "Auto created account", :enabled true, :id "da05a30dff7746b9a20027a68cfe6076", :name "facebook1428467850"})
+
+
+(comment "two ways to obtain the token-id having a token object response"
+  (defn get-token-id[response-body-json] (-> response-body-json :access :token :id))
+  (defn get-token-id [data]
+    (get-in data [:access :token :id])))
