@@ -106,17 +106,27 @@
 (comment "having endpoints give me 'compute' endpoints"
          (:compute (structured-endpoints endpoints-mock)))
 
+
+;; {:success true, :flavors [{:id "2", :links [{:href "http://8.21.28.222:8774/v2/da05a30dff7746b9a20027a68cfe6076/flavors/2", :rel "self"} {:href "http://8.21.28.222:8774/da05a30dff7746b9a20027a68cfe6076/flavors/2", :rel "bookmark"}], :name "m1.small"} {:id "3", :links [{:href "http://8.21.28.222:8774/v2/da05a30dff7746b9a20027a68cfe6076/flavors/3", :rel "self"} {:href "http://8.21.28.222:8774/da05a30dff7746b9a20027a68cfe6076/flavors/3", :rel "bookmark"}], :name "m1.medium"}]}
+(defn service-call [token-id publicURL path]
+  (let [url (str publicURL "/" (name path) )]
+   (handler/adapt-call (client/get url
+                                   {:headers {"X-Auth-Token" token-id}
+                                    :content-type :json
+                                    :socket-timeout 2000 ;; in milliseconds
+                                    :conn-timeout 2000 ;; in milliseconds
+                                    :accept :json})))
+  )
+
+
 (defn operation  [login-url username password tenant-name service-type path]
   (let [eps (login-url endpoints username password tenant-name)
         token-id (get-in eps [:access :token :id])
         publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
-        url (str publicURL "/" (name path) )]
-    (handler/adapt-call (client/get url
-                            {:headers {"X-Auth-Token" token-id}
-                             :content-type :json
-                             :socket-timeout 2000 ;; in milliseconds
-                             :conn-timeout 2000   ;; in milliseconds
-                             :accept :json}))))
+]
+
+    (service-call token-id publicURL path)
+    ))
 
 (comment "get :compute :images of _tenant_selected"
   (operation url "facebook1428467850" "3a34gc72":compute :images)
