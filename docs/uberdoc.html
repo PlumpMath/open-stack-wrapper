@@ -3028,38 +3028,72 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>open-stack-wrapper -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">open-stack-wrapper</h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>FIXME: write description</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">clj-http</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">liberator</td><td class="dotted"><hr /></td><td class="dep-version">0.10.0</td></tr><tr><td class="dep-name">org.clojure/data.json</td><td class="dotted"><hr /></td><td class="dep-version">0.2.4</td></tr><tr><td class="dep-name">compojure</td><td class="dotted"><hr /></td><td class="dep-version">1.1.3</td></tr><tr><td class="dep-name">ring/ring-core</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">ring/ring-jetty-adapter</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#open-stack-wrapper.core">open-stack-wrapper.core</a></li><li><a href="#open-stack-wrapper.handler">open-stack-wrapper.handler</a></li><li><a href="#open-stack-wrapper.mock">open-stack-wrapper.mock</a></li><li><a href="#open-stack-wrapper.rest">open-stack-wrapper.rest</a></li><li><a href="#open-stack-wrapper.util">open-stack-wrapper.util</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.core" name="open-stack-wrapper.core"><h1 class="project-name">open-stack-wrapper.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</script><title>com.enterpriseweb/open-stack-wrapper -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">com.enterpriseweb/open-stack-wrapper</h1><h2 class="project-version">0.1.0</h2><br /><p>FIXME: write description</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.5.1</td></tr><tr><td class="dep-name">clj-http</td><td class="dotted"><hr /></td><td class="dep-version">0.7.8</td></tr><tr><td class="dep-name">org.clojure/data.json</td><td class="dotted"><hr /></td><td class="dep-version">0.2.4</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#open-stack-wrapper.core">open-stack-wrapper.core</a></li><li><a href="#open-stack-wrapper.handler">open-stack-wrapper.handler</a></li><li><a href="#open-stack-wrapper.mock">open-stack-wrapper.mock</a></li><li><a href="#open-stack-wrapper.util">open-stack-wrapper.util</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.core" name="open-stack-wrapper.core"><h1 class="project-name">open-stack-wrapper.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns open-stack-wrapper.core
   (:use [open-stack-wrapper.util]
         [open-stack-wrapper.mock]
         [open-stack-wrapper.handler :as handler])
   (:require [clj-http.client :as client]
-            [clojure.data.json :as json]))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn tokens []
-  (handler/adapt-call (client/post &quot;http://8.21.28.222:5000/v2.0/tokens&quot;
+            [clojure.data.json :as json]))</pre></td></tr><tr><td class="docs"><p>{:success :boolean,
+ :access
+ {:token {:issued_at "S", :expires "S", :id "S"},
+  :serviceCatalog [],
+  :user
+  {:username "S", :roles_links [], :id "S", :roles [], :name "S"},
+  :metadata {:is_admin "N", :roles []}}}</p>
+</td><td class="codes"><pre class="brush: clojure">(defn tokens [url username password]
+  (handler/adapt-call (client/post (str url &quot;/v2.0/tokens&quot;)
                            {:body (json/write-str {:auth
                                                    {:passwordCredentials
-                                                    {:username &quot;facebook1428467850&quot;
-                                                     :password &quot;3a34gc72&quot;}}})
+                                                    {:username username
+                                                     :password password}}})
                                         ;   :body &quot;{\&quot;json\&quot;: \&quot;input\&quot;}&quot;
                                         ;   :headers {&quot;X-Api-Version&quot; &quot;2&quot;}
                             :content-type :json
                             :socket-timeout 2000 ;; in milliseconds
                             :conn-timeout 2000 ;; in milliseconds
-                            :accept :json})))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn tenants [token]
-  (handler/adapt-call (client/get &quot;http://8.21.28.222:5000/v2.0/tenants&quot;
+                            :accept :json})))</pre></td></tr><tr><td class="docs"><p>{:success :boolean,
+ :tenants_links [],
+ :tenants [{:enabled :boolean, :name "S", :id "S", :description "S"}]}
+{:success :boolean,
+ :tenants_links [],
+ :tenants [{:enabled :boolean, :name "S", :id "S", :description "S"}]}</p>
+</td><td class="codes"><pre class="brush: clojure">(defn tenants [url token]
+  (handler/adapt-call (client/get (str url &quot;/v2.0/tenants&quot;)
                {:headers {&quot;X-Auth-Token&quot; token}
                 :content-type :json
                 :socket-timeout 2000 ;; in milliseconds
                 :conn-timeout 2000   ;; in milliseconds
-                :accept :json})))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn endpoints [tenant-name]
-  (handler/adapt-call (client/post &quot;http://8.21.28.222:5000/v2.0/tokens&quot;
+                :accept :json})))</pre></td></tr><tr><td class="docs"><p>{:success :boolean,
+ :access
+ {:token
+  {:issued_at "S",
+   :expires "S",
+   :id "S",
+   :tenant {:description "S", :enabled :boolean, :id "S", :name "S"}},
+  :serviceCatalog
+  [{:endpoints
+    [{:adminURL "S",
+      :region "S",
+      :internalURL "S",
+      :id "S",
+      :publicURL "S"}],
+    :endpoints_links [],
+    :type "S",
+    :name "S"}],
+  :user
+  {:username "S",
+   :roles_links [],
+   :id "S",
+   :roles [{:name "S"}],
+   :name "S"},
+  :metadata {:is_admin "N", :roles ["S"]}}}</p>
+</td><td class="codes"><pre class="brush: clojure">(defn endpoints [url username password tenant-name]
+  (handler/adapt-call (client/post (str url &quot;/v2.0/tokens&quot;)
                 {
-                 :body (json/write-str {:auth  {:passwordCredentials {:username &quot;facebook1428467850&quot;
-                                                                      :password &quot;3a34gc72&quot;}
+                 :body (json/write-str {:auth  {:passwordCredentials {:username username
+                                                                      :password password}
                                                 :tenantName tenant-name}})
                                         ;   :body &quot;{\&quot;json\&quot;: \&quot;input\&quot;}&quot;
                                         ;   :headers {&quot;X-Api-Version&quot; &quot;2&quot;}
@@ -3069,7 +3103,15 @@ net.brehaut.ClojureTools = (function (SH) {
                  :accept :json})))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(comment   &quot;pprinting data&quot;
 
-  (pprint-json-scheme endpoints-mock))</pre></td></tr><tr><td class="docs">
+  (pprint-json-scheme endpoints-mock))</pre></td></tr><tr><td class="docs"><p>{:network {:name "S", :id "S", :publicURL "S"},
+ :compute {:name "S", :id "S", :publicURL "S"},
+ :image {:name "S", :id "S", :publicURL "S"},
+ :identity {:name "S", :id "S", :publicURL "S"},
+ :ec2 {:name "S", :id "S", :publicURL "S"},
+ :metering {:name "S", :id "S", :publicURL "S"},
+ :object-store {:name "S", :id "S", :publicURL "S"},
+ :s3 {:name "S", :id "S", :publicURL "S"},
+ :volume {:name "S", :id "S", :publicURL "S"}}</p>
 </td><td class="codes"><pre class="brush: clojure">(defn structured-endpoints [data]
   &quot;in this development state we take the first endpoint available on each service&quot;
   (let [services (get-in data [:access :serviceCatalog])]
@@ -3084,8 +3126,8 @@ net.brehaut.ClojureTools = (function (SH) {
      services)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(comment &quot;having endpoints give me 'compute' endpoints&quot;
          (:compute (structured-endpoints endpoints-mock)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn operation  [tenant-name service-type path]
-  (let [eps (endpoints tenant-name)
+</td><td class="codes"><pre class="brush: clojure">(defn operation  [login-url username password tenant-name service-type path]
+  (let [eps (login-url endpoints username password tenant-name)
         token-id (get-in eps [:access :token :id])
         publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
         url (str publicURL &quot;/&quot; (name path) )]
@@ -3096,22 +3138,25 @@ net.brehaut.ClojureTools = (function (SH) {
                              :conn-timeout 2000   ;; in milliseconds
                              :accept :json}))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(comment &quot;get :compute :images of _tenant_selected&quot;
-  (operation &quot;facebook1428467850&quot; :compute :images)
-  )</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.handler" name="open-stack-wrapper.handler"><h1 class="project-name">open-stack-wrapper.handler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+  (operation url &quot;facebook1428467850&quot; &quot;3a34gc72&quot;:compute :images)
+)</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.handler" name="open-stack-wrapper.handler"><h1 class="project-name">open-stack-wrapper.handler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns open-stack-wrapper.handler
    (:require [clj-http.client :as client]
-            [clojure.data.json :as json]))</pre></td></tr><tr><td class="docs">
+            [clojure.data.json :as json]))</pre></td></tr><tr><td class="docs"><p>having a json-string response  obtain the body on json format</p>
 </td><td class="codes"><pre class="brush: clojure">(defn manage-error [e]
   (let [get-error (let [data-ex (.getData e)]
                     (json/read-str (get-in data-ex [:object :body]) :key-fn keyword))
         error (:error get-error)]
-    (str (:title error) &quot;. &quot; (:message error) &quot; Code:&quot; (:code error))))</pre></td></tr><tr><td class="docs"><p>having a json-string response  obtain the body on json format</p>
-</td><td class="codes"><pre class="brush: clojure">(defn get-response-body
-  [response] (json/read-str (:body response) :key-fn keyword))</pre></td></tr><tr><td class="docs">
+    {:success false :title (:title error) :message (:message error) :code (:code error)}))
+(defn get-response-body
+    [response] (json/read-str (:body response) :key-fn keyword))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmacro adapt-call [body]
   `(try
-    (get-response-body ~body)
-    (catch clojure.lang.ExceptionInfo e# (manage-error e#))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.mock" name="open-stack-wrapper.mock"><h1 class="project-name">open-stack-wrapper.mock</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+    (assoc (get-response-body ~body) :success true)
+    (catch java.net.MalformedURLException e# {:success false :title (type e#)})
+    (catch java.net.UnknownHostException e# {:success false :title (type e#)})
+    (catch clojure.lang.ExceptionInfo e# (manage-error e#))
+    (catch Exception e# {:success false :ex (type e#)})))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.mock" name="open-stack-wrapper.mock"><h1 class="project-name">open-stack-wrapper.mock</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns open-stack-wrapper.mock)
 (def endpoints-mock
   {:access {:token
@@ -3126,57 +3171,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(comment &quot;two ways to obtain the token-id having a token object response&quot;
   (defn get-token-id[response-body-json] (-&gt; response-body-json :access :token :id))
   (defn get-token-id [data]
-    (get-in data [:access :token :id])))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.rest" name="open-stack-wrapper.rest"><h1 class="project-name">open-stack-wrapper.rest</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>A new way to think about programs</h2>
-
-<p>What if your code and its documentation were one and the same?</p>
-
-<p>Much of the philosophy guiding literate programming is the realization of the answer to this question.
-However, if literate programming stands as a comprehensive programming methodology at one of end of the
-spectrum and no documentation stands as its antithesis, then Marginalia falls somewhere between. That is,
-you should always aim for comprehensive documentation, but the shortest path to a useful subset is the
-commented source code itself.</p>
-
-<h2>The art of Marginalia</h2>
-
-<p>If you’re fervently writing code that is heavily documented, then using Marginalia for your Clojure projects
-is as simple as running it on your codebase. However, if you’re unaccustomed to documenting your source, then
-the guidelines herein will help you make the most out of Marginalia for true-power documentation.</p>
-
-<p>Following the guidelines will work to make your code not only easier to follow – it will make it better.
-The very process of using Marginalia will help to crystalize your understanding of problem and its solution(s).</p>
-
-<p>The quality of the prose in your documentation will often reflect the quality of the code itself thus highlighting
-problem areas. The elimination of problem areas will solidify your code and its accompanying prose. Marginalia
-provides a virtuous circle spiraling inward toward maximal code quality.</p>
-
-<h2>The one true way</h2>
-
-<ol>
-<li>Start by running Marginalia against your code</li>
-<li>Cringe at the sad state of your code commentary</li>
-<li>Add docstrings and code comments as appropriate</li>
-<li>Generate the documentation again</li>
-<li>Read the resulting documentation</li>
-<li>Make changes to code and documentation so that the “dialog” flows sensibly</li>
-<li>Repeat from step #4 until complete</li>
-</ol>
-</td><td class="codes"><pre class="brush: clojure">(ns open-stack-wrapper.rest
-  (:use [open-stack-wrapper.core])
-   (:require [liberator.core :refer [resource defresource]]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [compojure.core :refer [defroutes ANY]]))
-(defroutes app
-  (ANY &quot;/tokens&quot; [] (resource :available-media-types [&quot;application/json&quot;]
-                              :handle-ok (fn [ctx]  {:success true :token-id (get-in (tokens) [:access :token :id])})))
-  (ANY  &quot;/endpoints/:tenant&quot; [tenant]  (resource :allowed-methods [:post :get]
-                                          :available-media-types [&quot;application/json&quot;]
-                                          :handle-ok (fn [_]  {:success true :endpoints (structured-endpoints (endpoints tenant))}))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def handler
-  (-&gt; app
-      (wrap-params)))
-(comment
- (run-jetty #'handler {:port 3000}))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.util" name="open-stack-wrapper.util"><h1 class="project-name">open-stack-wrapper.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+    (get-in data [:access :token :id])))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#open-stack-wrapper.util" name="open-stack-wrapper.util"><h1 class="project-name">open-stack-wrapper.util</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns open-stack-wrapper.util
   (:use [clojure.pprint])
   (:require [clj-http.client :as client]

@@ -6,9 +6,15 @@
             [clojure.data.json :as json])
   )
 
-
-(defn tokens [username password]
-  (handler/adapt-call (client/post "http://8.21.28.222:5000/v2.0/tokens"
+;; {:success :boolean,
+;;  :access
+;;  {:token {:issued_at "S", :expires "S", :id "S"},
+;;   :serviceCatalog [],
+;;   :user
+;;   {:username "S", :roles_links [], :id "S", :roles [], :name "S"},
+;;   :metadata {:is_admin "N", :roles []}}}
+(defn tokens [url username password]
+  (handler/adapt-call (client/post (str url "/v2.0/tokens")
                            {:body (json/write-str {:auth
                                                    {:passwordCredentials
                                                     {:username username
@@ -20,17 +26,46 @@
                             :conn-timeout 2000 ;; in milliseconds
                             :accept :json})))
 
-(defn tenants [token]
-  (handler/adapt-call (client/get "http://8.21.28.222:5000/v2.0/tenants"
+;; {:success :boolean,
+;;  :tenants_links [],
+;;  :tenants [{:enabled :boolean, :name "S", :id "S", :description "S"}]}
+;; {:success :boolean,
+;;  :tenants_links [],
+;;  :tenants [{:enabled :boolean, :name "S", :id "S", :description "S"}]}
+(defn tenants [url token]
+  (handler/adapt-call (client/get (str url "/v2.0/tenants")
                {:headers {"X-Auth-Token" token}
                 :content-type :json
                 :socket-timeout 2000 ;; in milliseconds
                 :conn-timeout 2000   ;; in milliseconds
                 :accept :json}))
   )
-
-(defn endpoints [username password tenant-name]
-  (handler/adapt-call (client/post "http://8.21.28.222:5000/v2.0/tokens"
+;; {:success :boolean,
+;;  :access
+;;  {:token
+;;   {:issued_at "S",
+;;    :expires "S",
+;;    :id "S",
+;;    :tenant {:description "S", :enabled :boolean, :id "S", :name "S"}},
+;;   :serviceCatalog
+;;   [{:endpoints
+;;     [{:adminURL "S",
+;;       :region "S",
+;;       :internalURL "S",
+;;       :id "S",
+;;       :publicURL "S"}],
+;;     :endpoints_links [],
+;;     :type "S",
+;;     :name "S"}],
+;;   :user
+;;   {:username "S",
+;;    :roles_links [],
+;;    :id "S",
+;;    :roles [{:name "S"}],
+;;    :name "S"},
+;;   :metadata {:is_admin "N", :roles ["S"]}}}
+(defn endpoints [url username password tenant-name]
+  (handler/adapt-call (client/post (str url "/v2.0/tokens")
                 {
                  :body (json/write-str {:auth  {:passwordCredentials {:username username
                                                                       :password password}
@@ -46,7 +81,15 @@
 (comment   "pprinting data"
 
   (pprint-json-scheme endpoints-mock))
-
+;; {:network {:name "S", :id "S", :publicURL "S"},
+;;  :compute {:name "S", :id "S", :publicURL "S"},
+;;  :image {:name "S", :id "S", :publicURL "S"},
+;;  :identity {:name "S", :id "S", :publicURL "S"},
+;;  :ec2 {:name "S", :id "S", :publicURL "S"},
+;;  :metering {:name "S", :id "S", :publicURL "S"},
+;;  :object-store {:name "S", :id "S", :publicURL "S"},
+;;  :s3 {:name "S", :id "S", :publicURL "S"},
+;;  :volume {:name "S", :id "S", :publicURL "S"}}
 (defn structured-endpoints [data]
   "in this development state we take the first endpoint available on each service"
   (let [services (get-in data [:access :serviceCatalog])]
@@ -63,8 +106,8 @@
 (comment "having endpoints give me 'compute' endpoints"
          (:compute (structured-endpoints endpoints-mock)))
 
-(defn operation  [username password tenant-name service-type path]
-  (let [eps (endpoints username password tenant-name)
+(defn operation  [login-url username password tenant-name service-type path]
+  (let [eps (login-url endpoints username password tenant-name)
         token-id (get-in eps [:access :token :id])
         publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
         url (str publicURL "/" (name path) )]
@@ -76,5 +119,5 @@
                              :accept :json}))))
 
 (comment "get :compute :images of _tenant_selected"
-  (operation "facebook1428467850" "3a34gc72":compute :images)
-  )
+  (operation url "facebook1428467850" "3a34gc72":compute :images)
+)
