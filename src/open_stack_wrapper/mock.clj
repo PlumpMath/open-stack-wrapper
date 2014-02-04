@@ -8,6 +8,10 @@
 (def token-mock
   {:access {:token {:issued_at "2014-01-28T18:28:50.514221", :expires "2014-01-29T18:28:50Z", :id "MIIDCwYJKoZIhvcNAQcCoIIC-DCCAvgCAQExCTAHBgUrDgMCGjCCAWEGCSqGSIb3DQEHAaCCAVIEggFOeyJhY2Nlc3MiOiB7InRva2VuIjogeyJpc3N1ZWRfYXQiOiAiMjAxNC0wMS0yOFQxODoyODo1MC41MTQyMjEiLCAiZXhwaXJlcyI6ICIyMDE0LTAxLTI5VDE4OjI4OjUwWiIsICJpZCI6ICJwbGFjZWhvbGRlciJ9LCAic2VydmljZUNhdGFsb2ciOiBbXSwgInVzZXIiOiB7InVzZXJuYW1lIjogImZhY2Vib29rMTQyODQ2Nzg1MCIsICJyb2xlc19saW5rcyI6IFtdLCAiaWQiOiAiMmVhZWRhYzBkY2MwNDM1Y2JmZWM2OWRjYmQzMzkxYjQiLCAicm9sZXMiOiBbXSwgIm5hbWUiOiAiZmFjZWJvb2sxNDI4NDY3ODUwIn0sICJtZXRhZGF0YSI6IHsiaXNfYWRtaW4iOiAwLCAicm9sZXMiOiBbXX19fTGCAYEwggF9AgEBMFwwVzELMAkGA1UEBhMCVVMxDjAMBgNVBAgMBVVuc2V0MQ4wDAYDVQQHDAVVbnNldDEOMAwGA1UECgwFVW5zZXQxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbQIBATAHBgUrDgMCGjANBgkqhkiG9w0BAQEFAASCAQDFQn2Zx33cfKgSzlHMPGvZHo6AsZgggFi4bLVrwdnLtpod0klBtmvEBnPhfxB7y8p8F2T4e2NIosfAjVeaT+jRmo6KQpjOwOh5QckYTki3NMct0UD801b0lLkasY3RAa67WsaSS32FzHE+2mLcYnwxUj0ibWE6KYOqjo6mjajc5FWmGm9O8jd-9p6SEudXPlSOQf1Q6rJ1Drp5RP+M6mYuz+x2E1YL9QJQ4tSJq1AyaWP9+icdbyskJiaGwhBn5MnYfF+vlYiJL+8ZaijxTUhMW2l6sfWRpOdn3MT+owDJzbUvdWAcwkFOBUY40xR3djVaBQf7phsGs-+A3sXCpYAw"}, :serviceCatalog [], :user {:username "facebook1428467850", :roles_links [], :id "2eaedac0dcc0435cbfec69dcbd3391b4", :roles [], :name "facebook1428467850"}, :metadata {:is_admin 0, :roles []}}})
 
+(def nova-images-service-scheme [{:name "S", :links [{:href "S", :rel "S"}], :id "S"}])
+
+
+
 (def token-id-mock
     (get-in token-mock [:access :token :id])
 )
