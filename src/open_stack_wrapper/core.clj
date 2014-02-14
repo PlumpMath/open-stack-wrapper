@@ -120,7 +120,7 @@
 
 
 (defn operation  [login-url username password tenant-name service-type path]
-  (let [eps (login-url endpoints username password tenant-name)
+  (let [eps (endpoints login-url username password tenant-name)
         token-id (get-in eps [:access :token :id])
         publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
 ]
