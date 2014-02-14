@@ -103,6 +103,7 @@
      {}
      services)))
 
+;([:identity "keystone"] [:ec2 "ec2"] [:volume "cinder"] [:image "glance"] [:s3 "s3"] [:computev3 "novav3"] [:volumev2 "cinderv2"] [:network "neutron"] [:compute "nova"])
 (comment "having endpoints give me 'compute' endpoints"
          (:compute (structured-endpoints endpoints-mock)))
 
@@ -127,7 +128,7 @@
 
     (service-call token-id publicURL path)
     ))
-
+;(operation "http://192.168.1.23:5000" "admin" "password" "admin" :compute "/images" )
 (comment "get :compute :images of _tenant_selected"
   (operation url "facebook1428467850" "3a34gc72":compute :images)
 )
