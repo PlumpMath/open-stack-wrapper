@@ -132,13 +132,13 @@
   (operation url "facebook1428467850" "3a34gc72":compute :images)
 )
 
-(defn create-server [token-id url-server flavor image network-id ]
+(defn create-server [token-id url-server server-name flavor image network-id ]
   (let [response (client/post url-server
                       {
                        :body (json/write-str {:server
                                               {:flavorRef flavor
                                                :imageRef image
-                                               :name "other"
+                                               :name server-name
                                                :networks [{:uuid network-id}]}
                                               })
                        :headers {"X-Auth-Token" token-id}
@@ -146,12 +146,12 @@
                        :socket-timeout 30000 ;; in milliseconds
                        :conn-timeout 30000   ;; in milliseconds
                        :accept :json})]
-    (if (= (:status server) 202)
+    (if (= (:status response) 202)
       (do
         ;{:server {:security_groups [{:name "default"}], :OS-DCF:diskConfig "MANUAL", :id "9596a7dc-8a35-4ff0-9b0d-7934b61579de", :links [{:href "http://192.168.1.16:8774/v2/21d1ae8a1ba941b1aadc49f4b521228b/servers/9596a7dc-8a35-4ff0-9b0d-7934b61579de", :rel "self"} {:href "http://192.168.1.16:8774/21d1ae8a1ba941b1aadc49f4b521228b/servers/9596a7dc-8a35-4ff0-9b0d-7934b61579de", :rel "bookmark"}], :adminPass "yxddXRQ9ZjuH"}}
-        (json/read-str (:body server) :key-fn keyword)
+        (merge {:success true } (json/read-str (:body response) :key-fn keyword))
         )
-      {:success false :code (:status server) :body response}
+      {:success false :code (:status response) :body response}
       )
     )
   )
