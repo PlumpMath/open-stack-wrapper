@@ -143,9 +143,10 @@
                                               })
                        :headers {"X-Auth-Token" token-id}
                        :content-type :json
-                       :socket-timeout 30000 ;; in milliseconds
-                       :conn-timeout 30000   ;; in milliseconds
+                       :socket-timeout 5000 ;; in milliseconds
+                       :conn-timeout 5000   ;; in milliseconds
                        :accept :json})]
+    (println response)
     (if (= (:status response) 202)
       (do
         ;{:server {:security_groups [{:name "default"}], :OS-DCF:diskConfig "MANUAL", :id "9596a7dc-8a35-4ff0-9b0d-7934b61579de", :links [{:href "http://192.168.1.16:8774/v2/21d1ae8a1ba941b1aadc49f4b521228b/servers/9596a7dc-8a35-4ff0-9b0d-7934b61579de", :rel "self"} {:href "http://192.168.1.16:8774/21d1ae8a1ba941b1aadc49f4b521228b/servers/9596a7dc-8a35-4ff0-9b0d-7934b61579de", :rel "bookmark"}], :adminPass "yxddXRQ9ZjuH"}}
@@ -153,20 +154,44 @@
         )
       {:success false :code (:status response) :body response}
       )
+
     )
   )
 
 
 
 
+(comment "process create-server"
+(def username "admin")
+(def password "password")
+(def url "http://192.168.1.16:5000")
+
+(def eps-res (endpoints url username password username))
+(def eps (structured-endpoints eps-res))
+(def token-id (get-in eps-res [:access :token :id]))
+(def nova-url (:publicURL (:compute eps)))
+(def quantum-url (:publicURL (:network eps)))
+(def images (service-call token-id nova-url :images))
+(def image (:href (first (:links (first (:images images))))))
+(def flavors (service-call token-id nova-url :flavors))
+(def flavor (:href (first (:links (first (:flavors flavors))))))
+(def networks (service-call token-id quantum-url "v2.0/networks"))
+(def network (:id (first (:networks networks))))
+
+(create-server token-id (str nova-url "/servers") "juanito5" flavor image network)
+
+
+
+         )
+
+
 (comment
-  (def token-id
-    "MIIL6gYJKoZIhvcNAQcCoIIL2zCCC9cCAQExCTAHBgUrDgMCGjCCCkAGCSqGSIb3DQEHAaCCCjEEggoteyJhY2Nlc3MiOiB7InRva2VuIjogeyJpc3N1ZWRfYXQiOiAiMjAxNC0wMi0xMVQwOTowODowNy4zNTMzODQiLCAiZXhwaXJlcyI6ICIyMDE0LTAyLTEyVDA5OjA4OjA3WiIsICJpZCI6ICJwbGFjZWhvbGRlciIsICJ0ZW5hbnQiOiB7ImRlc2NyaXB0aW9uIjogbnVsbCwgImVuYWJsZWQiOiB0cnVlLCAiaWQiOiAiMTI3MTFlMGNhMmFmNDFhMjk3NzI3NDZjZTdiNDM5NTMiLCAibmFtZSI6ICJhZG1pbiJ9fSwgInNlcnZpY2VDYXRhbG9nIjogW3siZW5kcG9pbnRzIjogW3siYWRtaW5VUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjo4Nzc0L3YyLzEyNzExZTBjYTJhZjQxYTI5NzcyNzQ2Y2U3YjQzOTUzIiwgInJlZ2lvbiI6ICJSZWdpb25PbmUiLCAiaW50ZXJuYWxVUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjo4Nzc0L3YyLzEyNzExZTBjYTJhZjQxYTI5NzcyNzQ2Y2U3YjQzOTUzIiwgImlkIjogIjNiNTU4N2MxOWJmZDQxM2E5YjlmNjgxNDMzMzExZGMyIiwgInB1YmxpY1VSTCI6ICJodHRwOi8vMTkyLjE2OC4xLjI2Ojg3NzQvdjIvMTI3MTFlMGNhMmFmNDFhMjk3NzI3NDZjZTdiNDM5NTMifV0sICJlbmRwb2ludHNfbGlua3MiOiBbXSwgInR5cGUiOiAiY29tcHV0ZSIsICJuYW1lIjogIm5vdmEifSwgeyJlbmRwb2ludHMiOiBbeyJhZG1pblVSTCI6ICJodHRwOi8vMTkyLjE2OC4xLjI2Ojk2OTYvIiwgInJlZ2lvbiI6ICJSZWdpb25PbmUiLCAiaW50ZXJuYWxVUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjo5Njk2LyIsICJpZCI6ICIyYTkyY2IzNTc5OTA0OWFiOGQ5YWU5NTcyNjY0ODBlMSIsICJwdWJsaWNVUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjo5Njk2LyJ9XSwgImVuZHBvaW50c19saW5rcyI6IFtdLCAidHlwZSI6ICJuZXR3b3JrIiwgIm5hbWUiOiAicXVhbnR1bSJ9LCB7ImVuZHBvaW50cyI6IFt7ImFkbWluVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6MzMzMyIsICJyZWdpb24iOiAiUmVnaW9uT25lIiwgImludGVybmFsVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6MzMzMyIsICJpZCI6ICIwMzRlMTNkODAyOWI0NDdkYTM3ODU0MTE5NWQ0OWY3NyIsICJwdWJsaWNVUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjozMzMzIn1dLCAiZW5kcG9pbnRzX2xpbmtzIjogW10sICJ0eXBlIjogInMzIiwgIm5hbWUiOiAiczMifSwgeyJlbmRwb2ludHMiOiBbeyJhZG1pblVSTCI6ICJodHRwOi8vMTkyLjE2OC4xLjI2OjkyOTIiLCAicmVnaW9uIjogIlJlZ2lvbk9uZSIsICJpbnRlcm5hbFVSTCI6ICJodHRwOi8vMTkyLjE2OC4xLjI2OjkyOTIiLCAiaWQiOiAiMWRiNDA4YzcyZDk2NGY3Mjg4ZDM4ZDYyOTczNTgxZjciLCAicHVibGljVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6OTI5MiJ9XSwgImVuZHBvaW50c19saW5rcyI6IFtdLCAidHlwZSI6ICJpbWFnZSIsICJuYW1lIjogImdsYW5jZSJ9LCB7ImVuZHBvaW50cyI6IFt7ImFkbWluVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6ODc3Ni92MS8xMjcxMWUwY2EyYWY0MWEyOTc3Mjc0NmNlN2I0Mzk1MyIsICJyZWdpb24iOiAiUmVnaW9uT25lIiwgImludGVybmFsVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6ODc3Ni92MS8xMjcxMWUwY2EyYWY0MWEyOTc3Mjc0NmNlN2I0Mzk1MyIsICJpZCI6ICIxMWUxODE2ODA1MmI0OTgxYmRiMzk3NzdmZGU3ZmNjMyIsICJwdWJsaWNVUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjo4Nzc2L3YxLzEyNzExZTBjYTJhZjQxYTI5NzcyNzQ2Y2U3YjQzOTUzIn1dLCAiZW5kcG9pbnRzX2xpbmtzIjogW10sICJ0eXBlIjogInZvbHVtZSIsICJuYW1lIjogImNpbmRlciJ9LCB7ImVuZHBvaW50cyI6IFt7ImFkbWluVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6ODc3My9zZXJ2aWNlcy9BZG1pbiIsICJyZWdpb24iOiAiUmVnaW9uT25lIiwgImludGVybmFsVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6ODc3My9zZXJ2aWNlcy9DbG91ZCIsICJpZCI6ICIxOTg4NDc1MmY4YWI0ZGEwODZhM2QxMWIzNmQwM2EzNSIsICJwdWJsaWNVUkwiOiAiaHR0cDovLzE5Mi4xNjguMS4yNjo4NzczL3NlcnZpY2VzL0Nsb3VkIn1dLCAiZW5kcG9pbnRzX2xpbmtzIjogW10sICJ0eXBlIjogImVjMiIsICJuYW1lIjogImVjMiJ9LCB7ImVuZHBvaW50cyI6IFt7ImFkbWluVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6MzUzNTcvdjIuMCIsICJyZWdpb24iOiAiUmVnaW9uT25lIiwgImludGVybmFsVVJMIjogImh0dHA6Ly8xOTIuMTY4LjEuMjY6NTAwMC92Mi4wIiwgImlkIjogIjRlNzc3M2I4OTdmZjQ4YmU4MWY2OTkwY2UxZWFlODVhIiwgInB1YmxpY1VSTCI6ICJodHRwOi8vMTkyLjE2OC4xLjI2OjUwMDAvdjIuMCJ9XSwgImVuZHBvaW50c19saW5rcyI6IFtdLCAidHlwZSI6ICJpZGVudGl0eSIsICJuYW1lIjogImtleXN0b25lIn1dLCAidXNlciI6IHsidXNlcm5hbWUiOiAiYWRtaW4iLCAicm9sZXNfbGlua3MiOiBbXSwgImlkIjogIjZkY2E2OGI5NTRiZDQ0YjU5ODJhMmVhZGZiZWE1MzAxIiwgInJvbGVzIjogW3sibmFtZSI6ICJhZG1pbiJ9XSwgIm5hbWUiOiAiYWRtaW4ifSwgIm1ldGFkYXRhIjogeyJpc19hZG1pbiI6IDAsICJyb2xlcyI6IFsiZGY5ZjM3MDNlNTBhNDRhM2JjOTRiOTZmODVmNzhhNWQiXX19fTGCAYEwggF9AgEBMFwwVzELMAkGA1UEBhMCVVMxDjAMBgNVBAgTBVVuc2V0MQ4wDAYDVQQHEwVVbnNldDEOMAwGA1UEChMFVW5zZXQxGDAWBgNVBAMTD3d3dy5leGFtcGxlLmNvbQIBATAHBgUrDgMCGjANBgkqhkiG9w0BAQEFAASCAQCEIWu+8LG1SCs6kNffvEcIb4nDIbDD4zp3ANyUvW3F9VE0Zt9OlsXb7NjJHzGO8nktLfkPs3-Frne6vb1AufmrIjsS9rhcLXhZfBBI0wp5vd5sYYgJZ912v8JbR5hejbmAV6-dHDSMjE5LHUM67odYvAo08GE0B9NEvzZzdoGu0CcgHl+b2+3kKEoIviNLqrImzTJEIHOk-hVv+9seQw7tDcAqrEx5SDgt8nNRfiYQI1yzDnyy-PJ9-tjD0woum7TeH9O6nzC7-uscaFsUB2oBaQaMZciFq170VdnHBtF7CO9Ui2fXsmIs70wb+xP-x1jyJS7v0XzHeOWwluwsnFHN")
+
   (let [url-server "http://8.21.28.222:8774/v2/da05a30dff7746b9a20027a68cfe6076/servers"
         flavor "http://8.21.28.222:8774/v2/da05a30dff7746b9a20027a68cfe6076/flavors/2"
         image "http://8.21.28.222:8774/da05a30dff7746b9a20027a68cfe6076/images/55ebdcd2-d6ce-4c24-8717-888dd01c551d"
         network-id "6c79a79f-8b75-4399-9fc2-72cabeb283a8"]
-    (client/post url-server
+    #_(client/post url-server
                  {
                   :body (json/write-str {:server
                                          {:flavorRef flavor
@@ -176,8 +201,8 @@
                                          })
                   :headers {"X-Auth-Token" token-id}
                   :content-type :json
-                  :socket-timeout 30000 ;; in milliseconds
-                  :conn-timeout 30000 ;; in milliseconds
+                  :socket-timeout 1000 ;; in milliseconds
+                  :conn-timeout 1000 ;; in milliseconds
                   :accept :json}))
   {:orig-content-encoding nil, :trace-redirects ["http://192.168.1.26:8774/v2/12711e0ca2af41a29772746ce7b43953/servers"], :request-time 17972, :status 202, :headers {"location" "http://192.168.1.26:8774/v2/12711e0ca2af41a29772746ce7b43953/servers/e3abbd40-0c1e-42e7-a4c4-8be375468b16", "content-type" "application/json", "content-length" "440", "x-compute-request-id" "req-6a3180a0-e47a-4d43-a28d-70bea51b01d0", "date" "Tue, 11 Feb 2014 10:02:28 GMT", "connection" "close"}, :body "{\"server\": {\"security_groups\": [{\"name\": \"default\"}], \"OS-DCF:diskConfig\": \"MANUAL\", \"id\": \"e3abbd40-0c1e-42e7-a4c4-8be375468b16\", \"links\": [{\"href\": \"http://192.168.1.26:8774/v2/12711e0ca2af41a29772746ce7b43953/servers/e3abbd40-0c1e-42e7-a4c4-8be375468b16\", \"rel\": \"self\"}, {\"href\": \"http://192.168.1.26:8774/12711e0ca2af41a29772746ce7b43953/servers/e3abbd40-0c1e-42e7-a4c4-8be375468b16\", \"rel\": \"bookmark\"}], \"adminPass\": \"7mwvWP2N8jUh\"}}"}
   )
