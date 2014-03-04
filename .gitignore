@@ -3,7 +3,7 @@
 /checkouts
 /pom.xml
 /.env
-pom.xml
+login.properties
 pom.xml.asc
 *.jar
 *.class
