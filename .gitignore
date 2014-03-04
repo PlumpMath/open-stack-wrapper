@@ -4,7 +4,7 @@
 /pom.xml
 /.env
 login.properties
-open-stack-wrapper-test/src/test/login.properties
+open-stack-wrapper-test/src/test/java/test/login.properties
 open-stack-wrapper-test/bin
 open-stack-wrapper-test/target
 pom.xml
