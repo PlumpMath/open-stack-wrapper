@@ -4,6 +4,9 @@
 /pom.xml
 /.env
 login.properties
+open-stack-wrapper-test/src/test/login.properties
+pom.xml
+pom.xml.asc
 *.jar
 *.class
 /.lein-*
