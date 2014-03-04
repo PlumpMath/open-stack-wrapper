@@ -19,7 +19,7 @@ $ lein install
 
 ### Testing library from mvn test or eclipse project (java code)
 
-** Prior to test you'll need a login.properties file** in this directory `./open-stack-wrapper-test/src/test/login.properties`
+** Prior to test you'll need a login.properties file** in this directory `./open-stack-wrapper-test/src/test/java/test/login.properties`
 
 With these properties:
 ```
