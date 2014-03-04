@@ -17,7 +17,7 @@ $ lein clean
 $ lein install
 ```
 
-### Testing library from mvn test or eclipse project (java code)
+### Testing library from eclipse project (java code)
 
 ** Prior to test you'll need a login.properties file** in this directory `./open-stack-wrapper-test/src/test/java/test/login.properties`
 
@@ -29,15 +29,6 @@ url=your-openstack-login-entrypoint(horizon)-include-port ex: http://8.21.28.222
 
 ```
 
-
-### MAVEN: And then:...
-
-```
-$ cd open-stack-wrapper/open-stack-wrapper-test
-$ mvn clean
-$ mvn test
-
-```
 
 ### Or, directly from eclipse: ....   
 1. create new java project using specific location (locate dir "open-stack-wrapper-test")   
