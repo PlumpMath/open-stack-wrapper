@@ -25,7 +25,7 @@ With these properties:
 ```
 username=your-openstack-username
 password=your-openstack-password
-url=your-openstack-login-entrypoint(horizon)-include-port ex: http://8.21.28.222:5000
+url=your-openstack-login-entrypoint(horizon)-include-port(http://8.21.28.222:5000)
 
 ```
 

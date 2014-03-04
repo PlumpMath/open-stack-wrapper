@@ -72,9 +72,10 @@
                                                 :tenantName tenant-name}})
                                         ;   :body "{\"json\": \"input\"}"
                                         ;   :headers {"X-Api-Version" "2"}
+
                  :content-type :json
-                 :socket-timeout 2000 ;; in milliseconds
-                 :conn-timeout 2000   ;; in milliseconds
+                 :socket-timeout 5000 ;; in milliseconds
+                 :conn-timeout 5000   ;; in milliseconds
                  :accept :json}))
   )
 
@@ -113,8 +114,8 @@
    (handler/adapt-call (client/get url
                                    {:headers {"X-Auth-Token" token-id}
                                     :content-type :json
-                                    :socket-timeout 2000 ;; in milliseconds
-                                    :conn-timeout 2000 ;; in milliseconds
+                                    :socket-timeout 5000 ;; in milliseconds
+                                    :conn-timeout 5000 ;; in milliseconds
                                     :accept :json})))
   )
 
