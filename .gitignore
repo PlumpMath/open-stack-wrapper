@@ -5,6 +5,8 @@
 /.env
 login.properties
 open-stack-wrapper-test/src/test/login.properties
+open-stack-wrapper-test/bin
+open-stack-wrapper-test/target
 pom.xml
 pom.xml.asc
 *.jar

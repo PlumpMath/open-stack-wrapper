@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 public class OpenStackTest {
 
 	
-	// @Test
+	@Test
 	public void testTokens() throws IOException {
 
 		Properties login = loadLoginProperties();
