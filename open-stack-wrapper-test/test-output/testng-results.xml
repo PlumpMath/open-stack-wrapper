@@ -2,15 +2,15 @@
 <testng-results skipped="0" failed="0" total="1" passed="1">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="11064" started-at="2014-03-05T18:15:13Z" finished-at="2014-03-05T18:15:24Z">
+  <suite name="Default suite" duration-ms="9987" started-at="2014-03-05T19:49:54Z" finished-at="2014-03-05T19:50:04Z">
     <groups>
     </groups>
-    <test name="Default test" duration-ms="11064" started-at="2014-03-05T18:15:13Z" finished-at="2014-03-05T18:15:24Z">
+    <test name="Default test" duration-ms="9987" started-at="2014-03-05T19:49:54Z" finished-at="2014-03-05T19:50:04Z">
       <class name="test.OpenStackTest">
-        <test-method status="PASS" signature="rtestTokens()[pri:0, instance:test.OpenStackTest@64633e5e]" name="rtestTokens" duration-ms="11047" started-at="2014-03-05T19:15:13Z" finished-at="2014-03-05T19:15:24Z">
+        <test-method status="PASS" signature="globalTest()[pri:0, instance:test.OpenStackTest@97494c8]" name="globalTest" duration-ms="9972" started-at="2014-03-05T20:49:54Z" finished-at="2014-03-05T20:50:04Z">
           <reporter-output>
           </reporter-output>
-        </test-method> <!-- rtestTokens -->
+        </test-method> <!-- globalTest -->
       </class> <!-- test.OpenStackTest -->
     </test> <!-- Default test -->
   </suite> <!-- Default suite -->

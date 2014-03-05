@@ -1,4 +1,4 @@
-(defproject com.enterpriseweb/open-stack-wrapper "0.1.6"
+(defproject com.enterpriseweb/open-stack-wrapper "0.1.7"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

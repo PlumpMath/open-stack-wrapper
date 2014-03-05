@@ -5,7 +5,7 @@
     <classes>
       <class name="test.OpenStackTest">
         <methods>
-          <include name="rtestTokens"/>
+          <include name="globalTest"/>
         </methods>
       </class> <!-- test.OpenStackTest -->
     </classes>

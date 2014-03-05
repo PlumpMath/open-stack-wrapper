@@ -21,7 +21,7 @@ public class OpenStackTest {
 	
 	
 	@Test
-	public void rtestTokens() throws IOException {
+	public void globalTest() throws IOException {
 
 		Properties login = loadLoginProperties();
 		JSONObject requestTokens = createJSONObject(
@@ -50,14 +50,30 @@ public class OpenStackTest {
 				login.getProperty("url") ,login.getProperty("username"),  "compute","/images" ));
 		System.out.println("operation");
 		System.out.println(operation);
-
-		JSONObject serviceCall=OpenStackAPI.serviceCall();
+		String epsToken=endpoints.getString("token-id");
+		String urlEps=endpoints.getJSONObject("eps").getJSONObject("compute").getString("publicURL");
+		String path="/images";
+		
+		System.out.println(epsToken);
+		System.out.println(urlEps);
+		System.out.println(path);
+		System.out.println(createJSONServiceCallObject(epsToken, urlEps, path));
+		JSONObject serviceCall=OpenStackAPI.servicecall(createJSONServiceCallObject(epsToken, urlEps, path));
 		System.out.println("service call");
 		System.out.println(serviceCall);
 		
 		
 		//assertTrue(true);
 	}
+	
+	private JSONObject createJSONServiceCallObject(String epsToken, String urlEps, String path) {
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("eps-token-id", epsToken);
+		jsonObject.put("url", urlEps);
+		jsonObject.put("path", path);
+		return jsonObject;
+	}
+
 	
 	private JSONObject createJSONOperationObject(String username, String password, String url, 
 			String tenantName, String serviceType, String path) {
