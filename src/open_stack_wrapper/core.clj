@@ -114,8 +114,8 @@
    (handler/adapt-call (client/get url
                                    {:headers {"X-Auth-Token" token-id}
                                     :content-type :json
-                                    :socket-timeout 5000 ;; in milliseconds
-                                    :conn-timeout 5000 ;; in milliseconds
+                                    :socket-timeout 10000 ;; in milliseconds
+                                    :conn-timeout 10000 ;; in milliseconds
                                     :accept :json})))
   )
 
