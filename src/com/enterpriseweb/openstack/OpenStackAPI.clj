@@ -11,6 +11,8 @@
                #^{:static true} [tenants [org.json.JSONObject] org.json.JSONObject]
                #^{:static true} [endpoints [org.json.JSONObject] org.json.JSONObject]
                #^{:static true} [operation [org.json.JSONObject] org.json.JSONObject]
+               #^{:static true} [serviceCall [org.json.JSONObject] org.json.JSONObject]
+
                ])
   )
 
@@ -40,6 +42,11 @@
   (create-json-java-object (clj-json/write-str {:response {:hola "que tal?"}}))
   )
 
+
+(defn get-service-call [{:keys [eps-token-id url path]}]
+  (service-call eps-token-id url path)
+  )
+
 (defn get-operation [{:keys [url username password tenant-name service-type path]}]
   (let [service-type (if (keyword? service-type) service-type (keyword service-type))]
     (os-core/operation url username password tenant-name service-type path))
@@ -51,7 +58,9 @@
 
 (defn get-endpoints-structured [m]
 
-  (os-core/structured-endpoints (get-endpoints m))
+  (let [eps (get-endpoints m)]
+    {:token-id (get-in eps [:access :token :id])
+     :eps (os-core/structured-endpoints eps)})
   )
 
 (defn get-tenants [{:keys [url token-id]}]
@@ -72,7 +81,10 @@
   (create-json-java-object (clj-json/write-str (get-endpoints-structured (java-json->clojure-json json-java-object))))
   )
 
-
+(defn -serviceCall [json-java-object]
+  (create-json-java-object
+   (clj-json/write-str (get-service-call (java-json->clojure-json json-java-object))))
+  )
 (defn -operation [json-java-object]
   (create-json-java-object
    (clj-json/write-str (get-operation (java-json->clojure-json json-java-object))))
@@ -108,6 +120,10 @@
   (def new-token-id (get-in endpoints-response [:access :token :id]))
 
   (service-call new-token-id (get-in  endpoints-structured  [:compute :publicURL] ) "/images")
+
+
+
+
   (def service-call-response *1)
 
 
@@ -139,5 +155,23 @@
     (.put "tenant-name" "admin")
 
     ))
+
+
+(get-endpoints-structured (java-json->clojure-json
+  (create-json-endpoints)))
+(def eps *1)
+
+(get-service-call {:eps-token-id (:token-id eps)
+                   :url (get-in eps [:eps :compute :publicURL])
+                   :path "/images"} )
+
+(def service-call-response *1)
+
+
+(defn create-json-service-call []
+  (doto (JSONObject.)
+    (.put "eps-token-id" (:token-id eps))
+    (.put "url" (get-in eps [:eps :compute :publicURL]))
+    (.put "path" "/images")))
 
   )

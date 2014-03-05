@@ -45,14 +45,17 @@ public class OpenStackTest {
 				login.getProperty("url") ,tokenId, "admin"));
 		System.out.println("endpoints");
 		System.out.println(endpoints);
-		//todo take new token-id tokenId=endpoints.getJSONObject("access").getJSONObject("token").getString("id");
-
-		JSONObject operation=OpenStackAPI.endpoints(createJSONOperationObject(login.getProperty("username"), 
+		JSONObject operation=OpenStackAPI.operation(createJSONOperationObject(login.getProperty("username"), 
 				login.getProperty("password"),
 				login.getProperty("url") ,login.getProperty("username"),  "compute","/images" ));
 		System.out.println("operation");
 		System.out.println(operation);
 
+		JSONObject serviceCall=OpenStackAPI.serviceCall();
+		System.out.println("service call");
+		System.out.println(serviceCall);
+		
+		
 		//assertTrue(true);
 	}
 	
