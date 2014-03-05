@@ -4,7 +4,7 @@
   <groupId>com.enterpriseweb</groupId>
   <artifactId>open-stack-wrapper</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.4</version>
+  <version>0.1.6</version>
   <name>open-stack-wrapper</name>
   <description>FIXME: write description</description>
   <url>http://example.com/FIXME</url>

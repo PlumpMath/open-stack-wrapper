@@ -22,8 +22,8 @@
                                         ;   :body "{\"json\": \"input\"}"
                                         ;   :headers {"X-Api-Version" "2"}
                             :content-type :json
-                            :socket-timeout 2000 ;; in milliseconds
-                            :conn-timeout 2000 ;; in milliseconds
+                            :socket-timeout 10000 ;; in milliseconds
+                            :conn-timeout 10000 ;; in milliseconds
                             :accept :json})))
 
 ;; {:success :boolean,
@@ -36,8 +36,8 @@
   (handler/adapt-call (client/get (str url "/v2.0/tenants")
                {:headers {"X-Auth-Token" token}
                 :content-type :json
-                :socket-timeout 2000 ;; in milliseconds
-                :conn-timeout 2000   ;; in milliseconds
+                :socket-timeout 10000 ;; in milliseconds
+                :conn-timeout 10000   ;; in milliseconds
                 :accept :json}))
   )
 ;; {:success :boolean,
@@ -124,8 +124,8 @@
   (let [eps (endpoints login-url username password tenant-name)
         token-id (get-in eps [:access :token :id])
         publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
-]
-
+        ]
+;    (println eps)(println token-id)(println service-type)
     (service-call token-id publicURL path)
     ))
 ;(operation "http://192.168.1.23:5000" "admin" "password" "admin" :compute "/images" )

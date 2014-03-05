@@ -1,5 +1,11 @@
 package test;
 
+
+
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -29,13 +35,43 @@ public class OpenStackTest {
 		String tokenId=tokens.getJSONObject("access").getJSONObject("token").getString("id");
 		System.out.println("tokenid");
 		System.out.println(tokenId);
-//		assert(null!= tokenId);
+
 		JSONObject tenants=OpenStackAPI.tenants(createJSONTenantsObject( tokenId, login.getProperty("url")));
-		System.out.println("tenants");
+		System.out.println("tenants");	
 		System.out.println(tenants);
+
+		JSONObject endpoints=OpenStackAPI.endpoints(createJSONEndPointsObject(login.getProperty("username"), 
+				login.getProperty("password"),
+				login.getProperty("url") ,tokenId, "admin"));
+		System.out.println("endpoints");
+		System.out.println(endpoints);
+		//todo take new token-id tokenId=endpoints.getJSONObject("access").getJSONObject("token").getString("id");
+
+		JSONObject operation=OpenStackAPI.endpoints(createJSONOperationObject(login.getProperty("username"), 
+				login.getProperty("password"),
+				login.getProperty("url") ,login.getProperty("username"),  "compute","/images" ));
+		System.out.println("operation");
+		System.out.println(operation);
+
 		//assertTrue(true);
 	}
 	
+	private JSONObject createJSONOperationObject(String username, String password, String url, 
+			String tenantName, String serviceType, String path) {
+		JSONObject jsonObject=createJSONObject(username, password, url);
+		jsonObject.put("tenant-name", tenantName);
+		jsonObject.put("service-type", serviceType);
+		jsonObject.put("path", path);
+		return jsonObject;
+	}
+
+	
+	private JSONObject createJSONEndPointsObject(String username, String password, String url, String tokenId,
+	 String tenantName) {
+		JSONObject jsonObject=createJSONObject(username, password, url);
+		jsonObject.put("tenant-name", tenantName);		
+		return jsonObject;
+	}
 	private JSONObject createJSONTenantsObject(String tokenId,
 			String url) {
 		JSONObject jsonObject = new JSONObject();
@@ -55,6 +91,7 @@ public class OpenStackTest {
 	}
 	
 	private Properties loadLoginProperties() throws IOException {
+
 		InputStream in = getClass().getResourceAsStream("login.properties");
 		Properties prop = new Properties();
 		prop.load(in);
