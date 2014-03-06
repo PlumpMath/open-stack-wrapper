@@ -56,26 +56,63 @@ public class OpenStackTest {
 		System.out.println(urlCompute);
 		System.out.println(urlQuantum);
 
-		JSONObject serviceCallImages=OpenStackAPI.servicecall(createJSONServiceCallObject(epsToken, urlCompute, "/images"));
+		JSONObject serviceCallImages=OpenStackAPI.serviceCall(createJSONServiceCallObject(epsToken, urlCompute, "/images"));
 		System.out.println("service call:images");
 		System.out.println(serviceCallImages);
                 JSONObject imageSelected=(JSONObject)serviceCallImages.getJSONArray("images").get(0);
                 String imageLink=((JSONObject)imageSelected.getJSONArray("links").get(0)).getString("href");
-                System.out.println( "**********************");
 		System.out.println( imageLink);
-		JSONObject serviceCallFlavors=OpenStackAPI.servicecall(createJSONServiceCallObject(epsToken, urlCompute, "/flavors"));
+
+		JSONObject serviceCallFlavors=OpenStackAPI.serviceCall(createJSONServiceCallObject(epsToken, urlCompute, "/flavors"));
 		System.out.println("service call:flavors");
 		System.out.println(serviceCallFlavors);
+                JSONObject flavorSelected=(JSONObject)serviceCallFlavors.getJSONArray("flavors").get(0);
+
+                String flavorLink=((JSONObject)flavorSelected.getJSONArray("links").get(0)).getString("href");
+		System.out.println( flavorLink);
+
+                //JSONObject createNetworkResponse=OpenStackAPI.createNetwork(createJSONCreateNetworkObject(epsToken, urlQuantum, "my-network-name"));
+		//System.out.println("create network!!!");
+		//System.out.println(createNetworkResponse);
 
 
-		JSONObject serviceCallNetworks=OpenStackAPI.servicecall(createJSONServiceCallObject(epsToken, urlQuantum, "v2.0/networks"));
+		JSONObject serviceCallNetworks=OpenStackAPI.serviceCall(createJSONServiceCallObject(epsToken, urlQuantum, "v2.0/networks"));
 		System.out.println("service call:networks");
 		System.out.println(serviceCallNetworks);
+                String networkId=((JSONObject)serviceCallNetworks.getJSONArray("networks").get(0)).getString("id");
+
+		System.out.println("first network id");
+		System.out.println(networkId);
+
+                JSONObject createSubnetResponse=OpenStackAPI.createSubnet(createJSONCreateSubnetObject(epsToken, urlQuantum,networkId, "192.168.198.0/24","192.168.198.40", "192.168.198.50"  ));
+		System.out.println(createSubnetResponse);
+
 
 
 
 		//assertTrue(true);
 	}
+
+    private JSONObject createJSONCreateSubnetObject(String epsToken, String urlQuantum, String networkId, String cidr, String start, String end) {
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("token-id", epsToken);
+		jsonObject.put("quantum-url", urlQuantum);
+		jsonObject.put("network-id", networkId);
+		jsonObject.put("cidr", cidr);
+		jsonObject.put("start", start);
+		jsonObject.put("end", end);
+		return jsonObject;
+    }
+
+
+
+    private JSONObject createJSONCreateNetworkObject(String epsToken, String urlQuantum, String networkName) {
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("token-id", epsToken);
+		jsonObject.put("quantum-url", urlQuantum);
+		jsonObject.put("network-name", networkName);
+		return jsonObject;
+    }
 
 	private JSONObject createJSONServiceCallObject(String epsToken, String urlEps, String path) {
 		JSONObject jsonObject=new JSONObject();
