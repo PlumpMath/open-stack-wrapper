@@ -1,8 +1,13 @@
 (ns open-stack-wrapper.util
   (:use [clojure.pprint])
   (:require [clj-http.client :as client]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            [clojure.java.io :as io])
   )
+
+(defn load-config [filename]
+  (with-open [r (io/reader filename)]
+    (read (java.io.PushbackReader. r))))
 
 (defn pprint-json-scheme
   "this fn analyze the json structure thinking that in vectors the elements repeat the same scheme,

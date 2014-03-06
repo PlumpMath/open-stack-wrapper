@@ -12,7 +12,7 @@ A Clojure library to work with open-stack rest api
 
 
 ```
-$ cd ew_snmp
+$ cd open-stack-wrapper
 $ lein clean
 $ lein install
 ```

@@ -2,12 +2,12 @@
 <testng-results skipped="0" failed="0" total="1" passed="1">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="9987" started-at="2014-03-05T19:49:54Z" finished-at="2014-03-05T19:50:04Z">
+  <suite name="Default suite" duration-ms="20699" started-at="2014-03-05T20:09:52Z" finished-at="2014-03-05T20:10:13Z">
     <groups>
     </groups>
-    <test name="Default test" duration-ms="9987" started-at="2014-03-05T19:49:54Z" finished-at="2014-03-05T19:50:04Z">
+    <test name="Default test" duration-ms="20699" started-at="2014-03-05T20:09:52Z" finished-at="2014-03-05T20:10:13Z">
       <class name="test.OpenStackTest">
-        <test-method status="PASS" signature="globalTest()[pri:0, instance:test.OpenStackTest@97494c8]" name="globalTest" duration-ms="9972" started-at="2014-03-05T20:49:54Z" finished-at="2014-03-05T20:50:04Z">
+        <test-method status="PASS" signature="globalTest()[pri:0, instance:test.OpenStackTest@2f93c0cf]" name="globalTest" duration-ms="20683" started-at="2014-03-05T21:09:52Z" finished-at="2014-03-05T21:10:13Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- globalTest -->
