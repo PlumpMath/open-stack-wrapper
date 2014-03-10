@@ -124,7 +124,8 @@
                                :content-type :json
                                :socket-timeout socket-timeout
                                :conn-timeout conn-timeout
-                               :accept :json})]
+                               :accept :json
+                               :throw-entire-message? true})]
 
     (if (= (:status response) 202)
       (merge {:success true } (json/read-str (:body response) :key-fn keyword))
