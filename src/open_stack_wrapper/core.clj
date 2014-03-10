@@ -1,9 +1,11 @@
 (ns open-stack-wrapper.core
-  (:use [open-stack-wrapper.util]
-        [open-stack-wrapper.mock]
-        [open-stack-wrapper.handler :as handler])
   (:require [clj-http.client :as client]
             [clojure.data.json :as json])
+    (:use [open-stack-wrapper.util]
+        [open-stack-wrapper.mock]
+        [open-stack-wrapper.handler :as handler]
+        [slingshot.slingshot :only [throw+ try+]]
+        )
   )
 
 ; definitions rest api call
@@ -57,6 +59,37 @@
                                     :conn-timeout conn-timeout
                                     :accept :json})))
 
+
+(defn delete [token-id url ]
+
+  (handler/adapt-call-delete
+   (client/delete url
+                  {:headers {"X-Auth-Token" token-id}
+                   :content-type :json
+                   :socket-timeout socket-timeout
+                   :conn-timeout conn-timeout
+                   :accept :json
+                   :throw-entire-message? true})
+
+
+   )
+  )
+(defn seg-delete [token-id url ]
+
+  (try+
+   (client/delete url
+                  {:headers {"X-Auth-Token" token-id}
+                   :content-type :json
+                   :socket-timeout socket-timeout
+                   :conn-timeout conn-timeout
+                   :accept :json
+                   :throw-entire-message? true})
+
+   (catch Object e
+     (println (:status e))
+     )
+   )
+  )
 
 (defn service-call [token-id publicURL path]
   (let [path (if (keyword? path) (name path) path)

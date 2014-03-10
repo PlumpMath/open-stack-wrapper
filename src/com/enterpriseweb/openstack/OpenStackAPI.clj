@@ -20,8 +20,6 @@
 
 ; UTILITIES
 
-
-
 (defn create-json-java-object [clojure-json-object]
   (JSONObject. (str clojure-json-object)))
 
@@ -30,6 +28,9 @@
 
 
 ; ADAPTERS
+(defn delete-entity [{:keys [eps-token-id url]}]
+  (os-core/delete eps-token-id url )
+  )
 (defn get-service-call [{:keys [eps-token-id url path]}]
   (os-core/service-call eps-token-id url path)
   )
@@ -91,6 +92,12 @@
    (clj-json/write-str (get-service-call (java-json->clojure-json json-java-object))))
   )
 
+(defn -delete [json-java-object]
+  (create-json-java-object
+   (clj-json/write-str (delete-entity (java-json->clojure-json json-java-object))))
+  )
+
+
 (defn -createServer [json-java-object]
   (create-json-java-object
    (clj-json/write-str (get-create-server (java-json->clojure-json json-java-object))))
@@ -137,43 +144,76 @@
 
   (def endpoints-response  *1)
 
+  (def new-token-id (get-in endpoints-response [:access :token :id]))
+
   (util/pprint-json-scheme endpoints-response)
 
   (def endpoints-structured (structured-endpoints endpoints-response))
 
+
+
   (util/pprint-json-scheme endpoints-structured)
 
 
-  (get-operation (assoc login-properties :tenant-name tenant-name :service-type "compute" :path "/images"))
+  (comment   (get-operation (assoc login-properties :tenant-name tenant-name :service-type "compute" :path "/images"))
 
-  (def operation-response *1)
-
-  (def new-token-id (get-in endpoints-response [:access :token :id]))
+             (def operation-response *1)
 
 
-  (get-service-call {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:compute :publicURL] ) :path "/images"})
+             (get-service-call {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:compute :publicURL] ) :path "/images"})
 
-  (def images-response *1)
+             (def images-response *1)
 
 
-  (get-service-call {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:compute :publicURL] ) :path "/flavors"})
+             (get-service-call {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:compute :publicURL] ) :path "/flavors"})
 
-  (def flavors-response *1)
+             (def flavors-response *1)
 
+
+
+
+             (util/pprint-json-scheme images-response)
+
+             (map (juxt :id :name #(:href (first (:links %)))) (:images  images-response)))
 
   (get-service-call {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:network :publicURL] ) :path "v2.0/networks"})
 
   (def networks-response *1)
 
 
-  (util/pprint-json-scheme images-response)
-
-  (map (juxt :id :name #(:href (first (:links %)))) (:images  images-response))
 
 
 
+  (defn create-json-create-network [name]
+    (doto (JSONObject.)
+      (.put "token-id" new-token-id)
+      (.put "quantum-url" (:publicURL (:network endpoints-structured)))
+      (.put "network-name" name)
+      )
+    )
 
-  (defn create-json-create-server []
+  (-createNetwork (create-json-create-network "new-network-testeee213123"))
+
+
+  (def response-create-network *1)
+
+(defn create-json-delete-network [id]
+    (doto (JSONObject.)
+      (.put "eps-token-id" new-token-id)
+      (.put "url" (str (:publicURL (:network endpoints-structured)) "v2.0/networks/" id))
+
+      )
+    )
+
+  (-delete (create-json-delete-network (get-in (java-json->clojure-json response-create-network) [:network :id])))
+
+
+   (-delete (create-json-delete-network (get-in networks-response [:networks 0 :id])))
+
+
+
+
+     (defn create-json-create-server []
     (doto (JSONObject.)
       (.put "token-id" new-token-id)
       (.put "nova-url" (:publicURL (:compute endpoints-structured)))
@@ -187,16 +227,6 @@
 
   (-createServer (create-json-create-server))
 
-
-  (defn create-json-create-network []
-    (doto (JSONObject.)
-      (.put "token-id" new-token-id)
-      (.put "quantum-url" (:publicURL (:network endpoints-structured)))
-      (.put "network-name" "ofuuuu")
-      )
-    )
-
-  (-createNetwork (create-json-create-network))
 
   (defn create-json-create-subnet []
     (doto (JSONObject.)
