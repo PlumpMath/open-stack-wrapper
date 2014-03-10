@@ -15,6 +15,8 @@
                #^{:static true} [createServer [org.json.JSONObject] org.json.JSONObject]
                #^{:static true} [createNetwork [org.json.JSONObject] org.json.JSONObject]
                #^{:static true} [createSubnet [org.json.JSONObject] org.json.JSONObject]
+               #^{:static true} [deleteNetwork [org.json.JSONObject] org.json.JSONObject]
+               #^{:static true} [deleteSubnet [org.json.JSONObject] org.json.JSONObject]
                ])
   )
 
@@ -92,10 +94,17 @@
    (clj-json/write-str (get-service-call (java-json->clojure-json json-java-object))))
   )
 
-(defn -delete [json-java-object]
-  (create-json-java-object
-   (clj-json/write-str (delete-entity (java-json->clojure-json json-java-object))))
-  )
+(defn -delete [json-java-object path]
+  (let [c (java-json->clojure-json json-java-object)
+        modified-json (assoc c :url (str (:eps-url c) path (:id c)))]
+    (create-json-java-object
+     (clj-json/write-str (delete-entity modified-json)))))
+
+(defn -deleteNetwork [json-java-object]
+  (-delete json-java-object "v2.0/networks/"))
+
+(defn -deleteSubnet [json-java-object]
+  (-delete json-java-object "v2.0/subnets/"))
 
 
 (defn -createServer [json-java-object]
@@ -135,7 +144,6 @@
 
   (get-tenants (assoc (select-keys login-properties [:url]) :token-id token-id))
 
-
   (def tenants-response *1)
   (def tenant-name (-> (:tenants tenants-response ) first  :name))
 
@@ -155,7 +163,8 @@
   (util/pprint-json-scheme endpoints-structured)
 
 
-  (comment   (get-operation (assoc login-properties :tenant-name tenant-name :service-type "compute" :path "/images"))
+  (comment
+    (get-operation (assoc login-properties :tenant-name tenant-name :service-type "compute" :path "/images"))
 
              (def operation-response *1)
 
@@ -192,28 +201,47 @@
       )
     )
 
-  (-createNetwork (create-json-create-network "new-network-testeee213123"))
+  (-createNetwork (create-json-create-network "juan-network-bis2"))
 
 
   (def response-create-network *1)
 
-(defn create-json-delete-network [id]
+  (defn create-json-delete-quantum-entity [id]
     (doto (JSONObject.)
       (.put "eps-token-id" new-token-id)
-      (.put "url" (str (:publicURL (:network endpoints-structured)) "v2.0/networks/" id))
+      (.put "eps-url" (:publicURL (:network endpoints-structured)) )
+      (.put "id" id)))
 
+
+  (-deleteNetwork (create-json-delete-quantum-entity (get-in (java-json->clojure-json response-create-network) [:network :id])))
+
+
+  (-deleteNetwork (create-json-delete-quantum-entity (get-in networks-response [:networks 2 :id])))
+  (-deleteNetwork (create-json-delete-quantum-entity "6a1d29a2-4fd8-4ed6-a44e-3665e8862bfa" ))
+
+
+  (defn create-json-create-subnet [network-id]
+    (doto (JSONObject.)
+      (.put "token-id" new-token-id)
+      (.put "quantum-url" (:publicURL (:network endpoints-structured)))
+      (.put "network-id" network-id)
+      (.put "cidr" "192.168.198.0/24")
+      (.put "start" "192.168.198.40")
+      (.put "end" "192.168.198.50")
       )
     )
 
-  (-delete (create-json-delete-network (get-in (java-json->clojure-json response-create-network) [:network :id])))
+  (-createSubnet (create-json-create-subnet (get-in (java-json->clojure-json response-create-network) [:network :id])))
 
 
-   (-delete (create-json-delete-network (get-in networks-response [:networks 0 :id])))
+  (def response-create-subnet (java-json->clojure-json *1))
 
 
 
+  (-deleteSubnet (create-json-delete-quantum-entity (get-in response-create-subnet [:subnet :id])))
 
-     (defn create-json-create-server []
+
+  (defn create-json-create-server []
     (doto (JSONObject.)
       (.put "token-id" new-token-id)
       (.put "nova-url" (:publicURL (:compute endpoints-structured)))
@@ -226,21 +254,6 @@
     )
 
   (-createServer (create-json-create-server))
-
-
-  (defn create-json-create-subnet []
-    (doto (JSONObject.)
-      (.put "token-id" new-token-id)
-      (.put "quantum-url" (:publicURL (:network endpoints-structured)))
-      (.put "network-id" (:id (last (:networks networks-response))))
-      (.put "cidr" "192.168.198.0/24")
-      (.put "start" "192.168.198.40")
-      (.put "end" "192.168.198.50")
-      )
-    )
-
-  (-createSubnet (create-json-create-subnet))
-
 
 
   (defn create-json-operation []
