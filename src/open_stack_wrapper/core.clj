@@ -29,24 +29,30 @@
 
 ; available calls
 
-(defn tokens [url username password]
-  (handler/adapt-call (client/post (str url "/v2.0/tokens")
-                                   {:body (json/write-str {:auth
-                                                           {:passwordCredentials
-                                                            {:username username
-                                                             :password password}}})
-                                    :content-type :json
-                                    :socket-timeout socket-timeout
-                                    :conn-timeout conn-timeout
-                                    :accept :json})))
+(defn tokens
+  ([ {:keys [url username password]}]
+   (tokens url username password))
+  ([url username password]
+     (handler/adapt-call (client/post (str url "/v2.0/tokens")
+                                      {:body (json/write-str {:auth
+                                                              {:passwordCredentials
+                                                               {:username username
+                                                                :password password}}})
+                                       :content-type :json
+                                       :socket-timeout socket-timeout
+                                       :conn-timeout conn-timeout
+                                       :accept :json}))))
 
-(defn tenants [url token]
-  (handler/adapt-call (client/get (str url "/v2.0/tenants")
-                                  {:headers {"X-Auth-Token" token}
-                                   :content-type :json
-                                   :socket-timeout socket-timeout
-                                   :conn-timeout conn-timeout
-                                   :accept :json})))
+(defn tenants
+  ([{:keys [url token-id]}]
+    (tenants url token-id))
+  ([url token]
+     (handler/adapt-call (client/get (str url "/v2.0/tenants")
+                                     {:headers {"X-Auth-Token" token}
+                                      :content-type :json
+                                      :socket-timeout socket-timeout
+                                      :conn-timeout conn-timeout
+                                      :accept :json}))))
 
 (defn endpoints [url username password tenant-name]
   (handler/adapt-call (client/post (str url "/v2.0/tokens")

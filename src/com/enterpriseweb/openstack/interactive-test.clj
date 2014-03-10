@@ -119,7 +119,8 @@
 
   (-createServer (create-json-create-server))
 
-  (-deleteServer (create-json-delete-nova-entity "dba192e9-5fff-481b-bb3d-1ed0b263e2aa"))
+  (def response-create-server (java-json->clojure-json *1))
+  (-deleteServer (create-json-delete-nova-entity (get-in response-create-server [:server :id])))
 
 
   )
@@ -128,11 +129,32 @@
 (comment
   (def login-properties (util/load-config "./login.properties"))
 
-  (get-tokens login-properties)
+  (defn create-json [m & more]
+    (reduce #(.put % (str %2) (%2 m) ) (JSONObject.) more )
+    )
+
+  (create-json login-properties :url :username :password )
+
+  (defn create-json-tenants []
+    (doto (JSONObject.)
+      (.put "url" (:url login-properties))
+      (.put "username" (:username login-properties))
+      (.put "password" (:password login-properties))
+))
+
+  (-tokens login-properties)
 
   (def tokens-response *1)
 
   (def token-id (get-in tokens-response [:access :token :id]))
+
+  (defn create-json-tenants []
+    (doto (JSONObject.)
+      (.put "url" (:url login-properties))
+      (.put "token-id" token-id)
+))
+
+  (-tenants (create-json-tenants))
 
   (get-tenants (assoc (select-keys login-properties [:url]) :token-id token-id))
 

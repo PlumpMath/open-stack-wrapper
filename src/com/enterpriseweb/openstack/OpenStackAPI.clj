@@ -25,6 +25,10 @@
 (defn create-json-java-object [clojure-json-object]
   (JSONObject. (str clojure-json-object)))
 
+(defn clojure-json->java-json [clojure-object]
+  (create-json-java-object (clj-json/write-str clojure-object)))
+
+
 (defn java-json->clojure-json  [java-json-object]
   (clj-json/read-str (.toString java-json-object) :key-fn keyword))
 
@@ -46,10 +50,6 @@
   (os-core/endpoints url username password tenant-name)
   )
 
-(defn get-tenants [{:keys [url token-id]}]
-  (os-core/tenants url token-id)
-  )
-
 (defn get-tokens [{:keys [url username password ]}]
   (os-core/tokens url username password)
   )
@@ -69,10 +69,31 @@
 
 ; JSON CALLS
 (defn -tokens [json-java-object]
-  (create-json-java-object (clj-json/write-str (get-tokens (java-json->clojure-json json-java-object)))))
+  (dispatch json-java-object os-core/tokens :url :username :password)
+)
+
+
+(comment
+  defn select-data [m ks]
+  (let [mapa {:uno 1 :dos 2 :tres 3}
+       claves [:uno :tres]]
+   (map #(get mapa %) claves)
+   (select-keys mapa claves)
+   ))
+
+(defn dispatch [json-java-object action-fn & ks]
+  (let [-clj-object (java-json->clojure-json json-java-object)
+        -selected-data (select-keys -clj-object ks)
+        action-result  (action-fn -selected-data)
+        to-json-java (clojure-json->java-json action-result)
+        ]
+    to-json-java
+))
+
+
 
 (defn -tenants [json-java-object]
-  (create-json-java-object (clj-json/write-str (get-tenants (java-json->clojure-json json-java-object))))
+  (dispatch json-java-object os-core/tenants :url :token-id)
   )
 
 (defn -endpoints
@@ -109,8 +130,6 @@
 (defn -deleteServer [json-java-object]
   (-delete json-java-object "/servers/"))
 
-
-
 (defn -createServer [json-java-object]
   (create-json-java-object
    (clj-json/write-str (get-create-server (java-json->clojure-json json-java-object))))
@@ -120,14 +139,11 @@
   (create-json-java-object
    (clj-json/write-str (get-create-network (java-json->clojure-json json-java-object))))
   )
+
 (defn -createSubnet [json-java-object]
   (create-json-java-object
    (clj-json/write-str (get-create-subnet (java-json->clojure-json json-java-object))))
   )
-
-
-
-
 
 (defn -operation [json-java-object]
   (create-json-java-object
@@ -138,6 +154,3 @@
   (println json-java-object)
   (create-json-java-object (clj-json/write-str {:response {:hola "que tal?"}}))
   )
-
-
-; INTERACTIVE TEST
