@@ -5,9 +5,6 @@
         [open-stack-wrapper.core :as os-core])
   (:import [org.json JSONObject]))
 
-(comment "voy por aqui TODO: "
-         el siguiente paso seria pasar en el jason object el action ejemplo
-         :action tokens or :action tenants or :action servicecall)
 
 (comment
 
@@ -69,7 +66,7 @@
    ;(map (juxt :id :name ) (:networks (java-json->clojure-json networks-response)))
 
   (-makeCall (clojure-json->java-json
-                   {:network-name "juan-network-6"
+                   {:network-name "juan-network-7"
                     :quantum-url (:publicURL (:network endpoints-structured))
                     :token-id new-token-id
                     :action :create-network}))
@@ -80,7 +77,7 @@
   (-makeCall (clojure-json->java-json
                    {:eps-token-id new-token-id
                     :eps-url (get-in endpoints-structured [:network :publicURL])
-                    :id (get-in+  networks-response [:networks 0 :id])
+                    :id (get-in+  networks-response [:networks 1 :id])
                     :action :delete-network}))
 
 

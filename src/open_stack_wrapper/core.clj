@@ -76,6 +76,7 @@
     {:token-id (get-in eps [:access :token :id])
      :eps (structured-endpoints eps)}))
 
+
 (defn delete
   ([{:keys  [eps-token-id url ]}]
      (delete eps-token-id url))
@@ -92,6 +93,7 @@
 
       ))
   )
+
 (defn seg-delete [token-id url ]
 
   (try+

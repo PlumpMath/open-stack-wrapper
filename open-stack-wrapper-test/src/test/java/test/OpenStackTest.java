@@ -28,26 +28,23 @@ public class OpenStackTest {
 				login.getProperty("username"),
 				login.getProperty("password"),
 				login.getProperty("url"));
-		JSONObject tokens =OpenStackAPI.tokens(requestTokens);
+		JSONObject tokens =OpenStackAPI.makeCall(requestTokens.put("action", "tokens"));
 
 		String tokenId=tokens.getJSONObject("access").getJSONObject("token").getString("id");
 		System.out.println("tokenid");
 		System.out.println(tokenId);
 
-		JSONObject tenants=OpenStackAPI.tenants(createJSONTenantsObject( tokenId, login.getProperty("url")));
+                JSONObject tenants=OpenStackAPI.makeCall(createJSONTenantsObject( tokenId, login.getProperty("url")).put("action", "tenants"));
 		System.out.println("tenants");
 		System.out.println(tenants);
 
-		JSONObject endpoints=OpenStackAPI.endpoints(createJSONEndPointsObject(login.getProperty("username"),
+		JSONObject endpoints=OpenStackAPI.makeCall(createJSONEndPointsObject(login.getProperty("username"),
 				login.getProperty("password"),
-				login.getProperty("url") ,tokenId, "admin"));
+                                 login.getProperty("url") ,tokenId, "admin").put("action", "endpoints")
+                                                           );
 		System.out.println("endpoints");
 		System.out.println(endpoints);
-		JSONObject operation=OpenStackAPI.operation(createJSONOperationObject(login.getProperty("username"),
-				login.getProperty("password"),
-				login.getProperty("url") ,login.getProperty("username"),  "compute","/images" ));
-		System.out.println("operation");
-		System.out.println(operation);
+
 		String epsToken=endpoints.getString("token-id");
 		String urlCompute=endpoints.getJSONObject("eps").getJSONObject("compute").getString("publicURL");
 		String urlQuantum=endpoints.getJSONObject("eps").getJSONObject("network").getString("publicURL");
@@ -56,21 +53,22 @@ public class OpenStackTest {
 		System.out.println(urlCompute);
 		System.out.println(urlQuantum);
 
-		JSONObject serviceCallImages=OpenStackAPI.serviceCall(createJSONServiceCallObject(epsToken, urlCompute, "/images"));
+		JSONObject serviceCallImages=OpenStackAPI.makeCall(createJSONServiceCallObject(epsToken, urlCompute).put("action", "list-images"));
 		System.out.println("service call:images");
 		System.out.println(serviceCallImages);
+
                 JSONObject imageSelected=(JSONObject)serviceCallImages.getJSONArray("images").get(0);
                 String imageLink=((JSONObject)imageSelected.getJSONArray("links").get(0)).getString("href");
 		System.out.println( imageLink);
 
-		JSONObject serviceCallFlavors=OpenStackAPI.serviceCall(createJSONServiceCallObject(epsToken, urlCompute, "/flavors"));
+		JSONObject serviceCallFlavors=OpenStackAPI.makeCall(createJSONServiceCallObject(epsToken, urlCompute).put("action", "list-flavors"));
 		System.out.println("service call:flavors");
 		System.out.println(serviceCallFlavors);
                 JSONObject flavorSelected=(JSONObject)serviceCallFlavors.getJSONArray("flavors").get(0);
 
                 String flavorLink=((JSONObject)flavorSelected.getJSONArray("links").get(0)).getString("href");
 		System.out.println( flavorLink);
-
+                /*
                 //JSONObject createNetworkResponse=OpenStackAPI.createNetwork(createJSONCreateNetworkObject(epsToken, urlQuantum, "my-network-name"));
 		//System.out.println("create network!!!");
 		//System.out.println(createNetworkResponse);
@@ -89,6 +87,7 @@ public class OpenStackTest {
 
 
 
+                */
 
 		//assertTrue(true);
 	}
@@ -114,21 +113,11 @@ public class OpenStackTest {
 		return jsonObject;
     }
 
-	private JSONObject createJSONServiceCallObject(String epsToken, String urlEps, String path) {
+	private JSONObject createJSONServiceCallObject(String epsToken, String urlEps) {
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("eps-token-id", epsToken);
 		jsonObject.put("url", urlEps);
-		jsonObject.put("path", path);
-		return jsonObject;
-	}
 
-
-	private JSONObject createJSONOperationObject(String username, String password, String url,
-			String tenantName, String serviceType, String path) {
-		JSONObject jsonObject=createJSONObject(username, password, url);
-		jsonObject.put("tenant-name", tenantName);
-		jsonObject.put("service-type", serviceType);
-		jsonObject.put("path", path);
 		return jsonObject;
 	}
 

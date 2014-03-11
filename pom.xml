@@ -4,7 +4,7 @@
   <groupId>com.enterpriseweb</groupId>
   <artifactId>open-stack-wrapper</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.7</version>
+  <version>0.1.8</version>
   <name>open-stack-wrapper</name>
   <description>FIXME: write description</description>
   <url>http://example.com/FIXME</url>
@@ -69,6 +69,11 @@
       <groupId>clj-http</groupId>
       <artifactId>clj-http</artifactId>
       <version>0.7.8</version>
+    </dependency>
+    <dependency>
+      <groupId>slingshot</groupId>
+      <artifactId>slingshot</artifactId>
+      <version>0.10.3</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
