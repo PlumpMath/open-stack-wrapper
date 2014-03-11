@@ -13,8 +13,6 @@
   (-makeCall (-> (create-java-json login-properties :url :username :password)
                 (assoc+ :action :tokens)))
 
-
-
   (def -tokens-response *1)
 
   (-makeCall (-> (create-java-json login-properties :url)

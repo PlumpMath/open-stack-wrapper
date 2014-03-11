@@ -54,8 +54,7 @@
                       :token-id :quantum-url :network-id :cidr :start :end]
       :create-server [os-core/create-server
                       nil
-                      :token-id :nova-url :server-name :flavor-href :image-href :network-id]
-      )))
+                      :token-id :nova-url :server-name :flavor-href :image-href :network-id])))
 
 
 (defn -makeCall [json-java-object]

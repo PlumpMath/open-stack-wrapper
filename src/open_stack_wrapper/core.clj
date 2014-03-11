@@ -45,7 +45,8 @@
                                        :content-type :json
                                        :socket-timeout socket-timeout
                                        :conn-timeout conn-timeout
-                                       :accept :json}))))
+                                       :accept :json
+                                       :throw-entire-message? true}))))
 
 (defn tenants
   ([{:keys [url token-id]}]
@@ -56,7 +57,8 @@
                                       :content-type :json
                                       :socket-timeout socket-timeout
                                       :conn-timeout conn-timeout
-                                      :accept :json}))))
+                                      :accept :json
+                                      :throw-entire-message? true}))))
 
 
 (defn endpoints [url username password tenant-name]
@@ -68,7 +70,8 @@
                                     :content-type :json
                                     :socket-timeout socket-timeout
                                     :conn-timeout conn-timeout
-                                    :accept :json})))
+                                    :accept :json
+                                    :throw-entire-message? true})))
 
 (defn endpoints-adaptated
   [{:keys  [url username password tenant-name]}]
@@ -94,22 +97,6 @@
       ))
   )
 
-(defn seg-delete [token-id url ]
-
-  (try+
-   (client/delete url
-                  {:headers {"X-Auth-Token" token-id}
-                   :content-type :json
-                   :socket-timeout socket-timeout
-                   :conn-timeout conn-timeout
-                   :accept :json
-                   :throw-entire-message? true})
-
-   (catch Object e
-     (println (:status e))
-     )
-   )
-  )
 
 (defn service-call
   ([{:keys  [eps-token-id url path]}]
@@ -122,23 +109,17 @@
                                         :content-type :json
                                         :socket-timeout socket-timeout
                                         :conn-timeout conn-timeout
-                                        :accept :json}))))
+                                        :accept :json
+                                        :throw-entire-message? true}))))
   )
 
-(defn operation  [login-url username password tenant-name service-type path]
-  (let [eps (endpoints login-url username password tenant-name)
-        token-id (get-in eps [:access :token :id])
-        publicURL (get-in  (structured-endpoints eps) [service-type :publicURL] )
-        ]
-                                        ;    (println eps)(println token-id)(println service-type)
-    (service-call token-id publicURL path)
-    ))
+
 
 (defn create-server
   ([{:keys  [token-id nova-url server-name flavor-href image-href network-id ]}]
      (create-server token-id nova-url server-name flavor-href image-href network-id))
   ([token-id nova-url server-name flavor-href image-href network-id ]
-     (let [response (client/post (str nova-url "/servers")
+   (handler/adapt-call (client/post (str nova-url "/servers")
                                  {
                                   :body (json/write-str {:server
                                                          {:flavorRef flavor-href
@@ -151,21 +132,14 @@
                                   :socket-timeout socket-timeout
                                   :conn-timeout conn-timeout
                                   :accept :json
-                                  :throw-entire-message? true})]
-
-       (if (= (:status response) 202)
-         (merge {:success true } (json/read-str (:body response) :key-fn keyword))
-         {:success false :code (:status response) :body response}
-         )
-
-       ))
+                                  :throw-entire-message? true})))
   )
 
 (defn create-network
   ([{:keys  [token-id quantum-url network-name]}]
      (create-network token-id quantum-url network-name))
   ([token-id quantum-url network-name]
-     (let [response (client/post (str quantum-url "v2.0/networks")
+     (handler/adapt-call (client/post (str quantum-url "v2.0/networks")
                                  {
                                   :body (json/write-str {:network
                                                          {:shared true
@@ -177,23 +151,17 @@
                                   :content-type :json
                                   :socket-timeout socket-timeout
                                   :conn-timeout conn-timeout
-                                  :accept :json})]
-
-       (if (= (:status response) 201)
-         (merge {:success true } (json/read-str (:body response) :key-fn keyword))
-         {:success false :code (:status response) :body response}
-         )
-
-       ))
+                                  :throw-entire-message? true
+                                  :accept :json}))
+)
   )
 
 (defn create-subnet
  ([{:keys  [token-id quantum-url network-id cidr start end]}]
      (create-subnet token-id quantum-url network-id cidr start end))
-  ([token-id quantum-url network-id cidr start end]
-     (let [response (client/post (str quantum-url "v2.0/subnets")
-                                                   {
-                                                    :body (json/write-str {:subnet
+ ([token-id quantum-url network-id cidr start end]
+    (handler/adapt-call (client/post (str quantum-url "v2.0/subnets")
+                                                   {:body (json/write-str {:subnet
                                                                            {:network_id network-id
                                                                             :ip_version 4
                                                                             :cidr cidr
@@ -205,23 +173,49 @@
                                                     :socket-timeout socket-timeout
                                                     :conn-timeout conn-timeout
                                                     :accept :json
-                                                    :throw-entire-message? true})]
-
-                         (if (= (:status response) 201)
-                           (merge {:success true } (json/read-str (:body response) :key-fn keyword))
-                           {:success false :code (:status response) :body response}
-                           )
-
-                         ))
+                                                    :throw-entire-message? true}))
+)
   )
 
-(comment "example operation  :compute :images of _tenant_selected"
+(comment
          (def login-properties (load-config "./login.properties"))
          (def username (:username login-properties))
          (def password (:password login-properties))
-         (def url (:url login-properties))
+         (def url "http://192.168.1.26:5000")
 
-         (operation url username password username :compute :images)
+         (tokens url "admin" "password" )
+         (def tokens-response *1)
+         (def token-id (get-in tokens-response [:access :token :id]))
+         (tenants url  token-id )
+         (def tenants-response *1)
+         (endpoints-adaptated {:url "http://192.168.1.26:5000" :username "admin" :password "password" :tenant-name "admin"})
+         (def endpoints-response *1)
+         (def token-eps (:token-id endpoints-response))
+         (def eps-structured (:eps endpoints-response))
+         (service-call token-eps (get-in eps-structured [:compute :publicURL]) "/images")
+         (def images-response *1)
+         (service-call token-eps (get-in eps-structured [:compute :publicURL]) "/flavors")
+         (def flavors-response *1)
+         (service-call token-eps (get-in eps-structured [:network :publicURL]) "v2.0/networks")
+         (def networks-response *1)
+         (create-network token-eps (get-in eps-structured [:network :publicURL]) "nueva-network")
+         (delete token-eps (str (get-in eps-structured [:network :publicURL])
+                                "v2.0/networks/"
+                                (get-in networks-response [:networks 0 :id])))
+
+         (service-call token-eps (get-in eps-structured [:network :publicURL]) "v2.0/subnets")
+         (def subnets-response *1)
+         (create-subnet token-eps (get-in eps-structured [:network :publicURL]) (get-in networks-response [:networks 0 :id]) "192.168.198.0/24" "192.168.198.40" "192.168.198.50")
+         (def response-create-subnet *1)
+         (delete token-eps (str (get-in eps-structured [:network :publicURL])
+                                "v2.0/subnets/"
+                                "e6066bc1-d716-4861-8b6f-1cdd238d3c39"))
+         (create-server token-eps
+                        (get-in eps-structured [:compute :publicURL])
+                        "mi-server-name"
+                        (get-in flavors-response [:flavors 0 :links 0 :href])
+                        (get-in images-response [:images 0 :links 0 :href])
+                        (get-in networks-response [:networks 0 :id]))
          )
 
 (comment "process create-network"

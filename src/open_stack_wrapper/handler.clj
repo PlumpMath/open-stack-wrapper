@@ -41,14 +41,35 @@
   )
 
 (defmacro adapt-call [body]
-  `(try
+  `(try+
     (assoc (get-response-body ~body) :success true)
-    (catch java.net.MalformedURLException e# {:success false :title (type e#)})
-    (catch java.net.UnknownHostException e# {:success false :title (type e#)})
-    (catch clojure.lang.ExceptionInfo e# (manage-error e#))
-    (catch Exception e# {:success false :ex (type e#)})
+    (catch Object e#
+      (condp = (:status e#)
+        400 {:success false :title "identity fault"}
+        401 {:success false :title "unauthorized"}
+        402 {:success false :title "unprocesable entity"}
+        500 {:success false :title "Unauthorized call"}
+        403 {:success false :title "forbidden"}
+        405 {:success false :title "bad method"}
+        413 {:success false :title "over limit"}
+        503 {:success false :title "service unavailable"}
+        404 {:success false :title "Item not found exception"}
+        409 {:success false :title "Conflict"}
+        415 {:success false :title "Bad media type"}
+        503 {:success false :title "server capacity unavailable"}
+        {:success false :title (str e#)
+         }
+        )
 
 
     )
 
-  )
+    )
+
+)
+  (comment
+    (catch java.net.MalformedURLException e# {:success false :title (type e#)})
+    (catch java.net.UnknownHostException e# {:success false :title (type e#)})
+    (catch clojure.lang.ExceptionInfo e# (manage-error e#))
+    (catch Exception e# {:success false :ex (type e#)})
+    )
