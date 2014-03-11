@@ -4,35 +4,38 @@
         [open-stack-wrapper.core :as os-core])
     (:import [org.json JSONObject]))
 
-(defn test-get-eps []
-  (let [login-properties (util/load-config "./login.properties")
-        tokens-response (get-tokens login-properties)
-        token-id (get-in tokens-response [:access :token :id])
-        tenants-response (get-tenants (assoc (select-keys login-properties [:url]) :token-id token-id))
-        tenant-name (-> (:tenants tenants-response ) first  :name)
-        endpoints-response (get-endpoints (assoc (select-keys login-properties [:url :password :username]) :tenant-name tenant-name))
-        new-token-id (get-in endpoints-response [:access :token :id])
-        endpoints-structured (os-core/structured-endpoints endpoints-response)]
-    (comment (println "tokens-response")
-             (println tokens-response)
-             (println "tenants-response")
-             (println tenants-response)
-             (println "endpoints-response")
-             (println endpoints-response))
-    [endpoints-structured new-token-id]
-    ))
 
 
+(comment "test-get-eps"
 
-(def eps-and-token #_(test-get-eps))
+  (def login-properties (util/load-config "./login.properties"))
+
+  (-tokens (create-java-json login-properties :url :username :password))
+
+  (def -tokens-response *1)
+
+  (-tenants (-> (create-java-json login-properties :url)
+                (assoc+ :token-id (get-in+ -tokens-response [:access :token :id]))))
+
+  (def -tenants-response *1)
+
+  (-endpoints (-> (create-java-json login-properties :url :password :username)
+                  (assoc+ :tenant-name (get-in+ -tenants-response [:tenants 0 :name]))))
+
+  (def -endpoints-response  *1)
+
+  (def new-token-id (get-in+ -endpoints-response [:token-id]))
+
+  (def endpoints-structured (get-in+ -endpoints-response [:eps]) )
+
+  )
+
 
 
 
 (comment
-  (def new-token-id (last eps-and-token))
-  (def endpoints-structured (first eps-and-token))
 
-  (get-service-call {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:compute :publicURL] ) :path "/images"})
+  (-serviceCall (clojure-json->java-json {:eps-token-id new-token-id :url (get-in  endpoints-structured  [:compute :publicURL] ) :path "/images"}))
 
   (def images-response *1)
 
@@ -126,58 +129,6 @@
   )
 
 
-(comment
-  (def login-properties (util/load-config "./login.properties"))
-
-  (defn create-json [m & more]
-    (reduce #(.put % (str %2) (%2 m) ) (JSONObject.) more )
-    )
-
-  (create-json login-properties :url :username :password )
-
-  (defn create-json-tenants []
-    (doto (JSONObject.)
-      (.put "url" (:url login-properties))
-      (.put "username" (:username login-properties))
-      (.put "password" (:password login-properties))
-))
-
-  (-tokens login-properties)
-
-  (def tokens-response *1)
-
-  (def token-id (get-in tokens-response [:access :token :id]))
-
-  (defn create-json-tenants []
-    (doto (JSONObject.)
-      (.put "url" (:url login-properties))
-      (.put "token-id" token-id)
-))
-
-  (-tenants (create-json-tenants))
-
-  (get-tenants (assoc (select-keys login-properties [:url]) :token-id token-id))
-
-  (def tenants-response *1)
-  (def tenant-name (-> (:tenants tenants-response ) first  :name))
-
-
-  (get-endpoints (assoc (select-keys login-properties [:url :password :username]) :tenant-name tenant-name))
-
-  (def endpoints-response  *1)
-
-  (def new-token-id (get-in endpoints-response [:access :token :id]))
-
-  (util/pprint-json-scheme endpoints-response)
-
-  (def endpoints-structured (structured-endpoints endpoints-response))
-
-
-
-  (util/pprint-json-scheme endpoints-structured)
-
-
-  )
 
 
 

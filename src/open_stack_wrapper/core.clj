@@ -54,6 +54,7 @@
                                       :conn-timeout conn-timeout
                                       :accept :json}))))
 
+
 (defn endpoints [url username password tenant-name]
   (handler/adapt-call (client/post (str url "/v2.0/tokens")
                                    {
@@ -65,6 +66,11 @@
                                     :conn-timeout conn-timeout
                                     :accept :json})))
 
+(defn endpoints-adaptated
+  [{:keys  [url username password tenant-name]}]
+  (let [eps (endpoints url username password tenant-name)]
+    {:token-id (get-in eps [:access :token :id])
+     :eps (structured-endpoints eps)}))
 
 (defn delete [token-id url ]
 
@@ -97,15 +103,18 @@
    )
   )
 
-(defn service-call [token-id publicURL path]
-  (let [path (if (keyword? path) (name path) path)
-        url (str publicURL "/" path )]
-    (handler/adapt-call (client/get url
-                                    {:headers {"X-Auth-Token" token-id}
-                                     :content-type :json
-                                     :socket-timeout socket-timeout
-                                     :conn-timeout conn-timeout
-                                     :accept :json})))
+(defn service-call
+  ([{:keys  [eps-token-id url path]}]
+     (service-call eps-token-id url path))
+  ([token-id publicURL path]
+     (let [path (if (keyword? path) (name path) path)
+           url (str publicURL "/" path )]
+       (handler/adapt-call (client/get url
+                                       {:headers {"X-Auth-Token" token-id}
+                                        :content-type :json
+                                        :socket-timeout socket-timeout
+                                        :conn-timeout conn-timeout
+                                        :accept :json}))))
   )
 
 (defn operation  [login-url username password tenant-name service-type path]
