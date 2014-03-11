@@ -6,6 +6,7 @@
   (:import [org.json JSONObject]))
 
 
+
 (comment
 
   (def login-properties (util/load-config "./login.properties"))
@@ -30,6 +31,10 @@
   (def new-token-id (get-in+ -endpoints-response [:token-id]))
 
   (def endpoints-structured (get-in+ -endpoints-response [:eps]) )
+
+
+
+  #_(map (juxt :name :publicURL) (vals endpoints-structured))
 
   "starting with endpoints stored"
 

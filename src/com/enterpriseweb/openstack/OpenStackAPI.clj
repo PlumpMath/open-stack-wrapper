@@ -8,14 +8,10 @@
 
 ;TODO throw exception if function is not evaluated!!
 (defn mapping [option]
-  (letfn  [(json-delete-adapter [json-java-object path]
-             (let [first-url (get-in+ json-java-object [:eps-url])
-                   id (get-in+ json-java-object [:id])
-                   modified-json (assoc+ json-java-object :url (str first-url path id))]
-               modified-json))]
+  (letfn  []
 
     (condp = option
-      :tokens [os-core/tokens nil :url :username :password]
+      :tokens os-core/tokens nil :url :username :password
       :tenants [os-core/tenants nil :token-id :url]
       :endpoints [os-core/endpoints-adaptated nil  :url :username :password :tenant-name]
       :list-images [os-core/service-call
@@ -36,15 +32,15 @@
                      :url :eps-token-id :path]
       :delete-network [os-core/delete
                        (fn [j]
-                         (json-delete-adapter j "v2.0/networks/"))
+                         (json-url-delete-adapter-add-id j "v2.0/networks/"))
                        :url :eps-token-id]
       :delete-subnet [os-core/delete
                       (fn [j]
-                        (json-delete-adapter j "v2.0/subnets/"))
+                        (json-url-delete-adapter-add-id j "v2.0/subnets/"))
                       :url :eps-token-id]
       :delete-server [os-core/delete
                       (fn [j]
-                        (json-delete-adapter j "/servers/"))
+                        (json-url-delete-adapter-add-id j "/servers/"))
                       :url :eps-token-id]
       :create-network [os-core/create-network
                        nil

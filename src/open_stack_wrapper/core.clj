@@ -75,9 +75,18 @@
 
 (defn endpoints-adaptated
   [{:keys  [url username password tenant-name]}]
-  (let [eps (endpoints url username password tenant-name)]
-    {:token-id (get-in eps [:access :token :id])
-     :eps (structured-endpoints eps)}))
+  (let [raw-eps (endpoints url username password tenant-name)
+        eps (structured-endpoints raw-eps)
+        adapted-local-url-eps (->> (map (fn [i] {i (assoc (i eps) :publicURL (clojure.string/replace (get-in eps [i :publicURL]) #"192.168.0.113" "208.124.249.142"))}) (keys eps))
+                                  (reduce into {})
+                                  )
+        #_(reduce
+     #(update-in % [(first %2) :publicURL] (fnil (fn [a] (clojure.string/replace (get-in eps [(first %2) :publicURL]) #"192.168.0.113" "208.124.249.142") ) 0) ) {} eps)
+        ]
+    {:token-id (get-in raw-eps [:access :token :id])
+     :eps adapted-local-url-eps}
+
+    ))
 
 
 (defn delete
@@ -181,17 +190,18 @@
          (def login-properties (load-config "./login.properties"))
          (def username (:username login-properties))
          (def password (:password login-properties))
-         (def url "http://192.168.1.26:5000")
+         (def url (:url login-properties))
 
          (tokens url "admin" "password" )
          (def tokens-response *1)
          (def token-id (get-in tokens-response [:access :token :id]))
          (tenants url  token-id )
          (def tenants-response *1)
-         (endpoints-adaptated {:url "http://192.168.1.26:5000" :username "admin" :password "password" :tenant-name "admin"})
+         (endpoints-adaptated {:url url :username "admin" :password "password" :tenant-name "admin"})
          (def endpoints-response *1)
          (def token-eps (:token-id endpoints-response))
          (def eps-structured (:eps endpoints-response))
+         (service-call token-eps (get-in eps-structured [:compute :publicURL]) "/servers")
          (service-call token-eps (get-in eps-structured [:compute :publicURL]) "/images")
          (def images-response *1)
          (service-call token-eps (get-in eps-structured [:compute :publicURL]) "/flavors")
@@ -212,10 +222,15 @@
                                 "e6066bc1-d716-4861-8b6f-1cdd238d3c39"))
          (create-server token-eps
                         (get-in eps-structured [:compute :publicURL])
-                        "mi-server-name"
+                        "juan-server"
                         (get-in flavors-response [:flavors 0 :links 0 :href])
                         (get-in images-response [:images 0 :links 0 :href])
-                        (get-in networks-response [:networks 0 :id]))
+                        (get-in networks-response [:networks 1 :id]))
+         (service-call token-eps (get-in eps-structured [:compute :publicURL]) "/servers")
+         (def servers-response *1)
+         (delete token-eps (str (get-in eps-structured [:compute :publicURL])
+                                "/servers/"
+                                (get-in servers-response [:servers 0 :id])))
          )
 
 (comment "process create-network"

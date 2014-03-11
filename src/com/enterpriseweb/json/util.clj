@@ -42,3 +42,12 @@
                                         ;    (println  action-fn -selected-data)
                                         ;   action-result
     to-json-java))
+
+
+(defn json-url-delete-adapter-add-id
+  ""
+  [json-java-object path]
+             (let [first-url (get-in+ json-java-object [:eps-url])
+                   id (get-in+ json-java-object [:id])
+                   modified-json (assoc+ json-java-object :url (str first-url path id))]
+               modified-json))
