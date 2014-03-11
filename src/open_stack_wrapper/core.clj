@@ -8,6 +8,8 @@
         )
   )
 
+(defn tester []
+  (println "tester"))
 ; definitions rest api call
 (def conn-timeout 10000)
 
@@ -28,6 +30,8 @@
      services)))
 
 ; available calls
+
+
 
 (defn tokens
   ([ {:keys [url username password]}]
