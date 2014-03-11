@@ -72,19 +72,21 @@
     {:token-id (get-in eps [:access :token :id])
      :eps (structured-endpoints eps)}))
 
-(defn delete [token-id url ]
+(defn delete
+  ([{:keys  [eps-token-id url ]}]
+     (delete eps-token-id url))
+  ([token-id url ]
+     (handler/adapt-call-delete
+      (client/delete url
+                     {:headers {"X-Auth-Token" token-id}
+                      :content-type :json
+                      :socket-timeout socket-timeout
+                      :conn-timeout conn-timeout
+                      :accept :json
+                      :throw-entire-message? true})
 
-  (handler/adapt-call-delete
-   (client/delete url
-                  {:headers {"X-Auth-Token" token-id}
-                   :content-type :json
-                   :socket-timeout socket-timeout
-                   :conn-timeout conn-timeout
-                   :accept :json
-                   :throw-entire-message? true})
 
-
-   )
+      ))
   )
 (defn seg-delete [token-id url ]
 
@@ -126,75 +128,85 @@
     (service-call token-id publicURL path)
     ))
 
-(defn create-server [token-id nova-url server-name flavor-href image-href network-id ]
-  (let [response (client/post (str nova-url "/servers")
-                              {
-                               :body (json/write-str {:server
-                                                      {:flavorRef flavor-href
-                                                       :imageRef image-href
-                                                       :name server-name
-                                                       :networks [{:uuid network-id}]}
-                                                      })
-                               :headers {"X-Auth-Token" token-id}
-                               :content-type :json
-                               :socket-timeout socket-timeout
-                               :conn-timeout conn-timeout
-                               :accept :json
-                               :throw-entire-message? true})]
+(defn create-server
+  ([{:keys  [token-id nova-url server-name flavor-href image-href network-id ]}]
+     (create-server token-id nova-url server-name flavor-href image-href network-id))
+  ([token-id nova-url server-name flavor-href image-href network-id ]
+     (let [response (client/post (str nova-url "/servers")
+                                 {
+                                  :body (json/write-str {:server
+                                                         {:flavorRef flavor-href
+                                                          :imageRef image-href
+                                                          :name server-name
+                                                          :networks [{:uuid network-id}]}
+                                                         })
+                                  :headers {"X-Auth-Token" token-id}
+                                  :content-type :json
+                                  :socket-timeout socket-timeout
+                                  :conn-timeout conn-timeout
+                                  :accept :json
+                                  :throw-entire-message? true})]
 
-    (if (= (:status response) 202)
-      (merge {:success true } (json/read-str (:body response) :key-fn keyword))
-      {:success false :code (:status response) :body response}
-      )
+       (if (= (:status response) 202)
+         (merge {:success true } (json/read-str (:body response) :key-fn keyword))
+         {:success false :code (:status response) :body response}
+         )
 
-    )
+       ))
   )
 
-(defn create-network [token-id quantum-url network-name]
-  (let [response (client/post (str quantum-url "v2.0/networks")
-                              {
-                               :body (json/write-str {:network
-                                                      {:shared true
-                                                       :admin_state_up false
-                                                       :name network-name
-                                                       }
-                                                      })
-                               :headers {"X-Auth-Token" token-id}
-                               :content-type :json
-                               :socket-timeout socket-timeout
-                               :conn-timeout conn-timeout
-                               :accept :json})]
+(defn create-network
+  ([{:keys  [token-id quantum-url network-name]}]
+     (create-network token-id quantum-url network-name))
+  ([token-id quantum-url network-name]
+     (let [response (client/post (str quantum-url "v2.0/networks")
+                                 {
+                                  :body (json/write-str {:network
+                                                         {:shared true
+                                                          :admin_state_up false
+                                                          :name network-name
+                                                          }
+                                                         })
+                                  :headers {"X-Auth-Token" token-id}
+                                  :content-type :json
+                                  :socket-timeout socket-timeout
+                                  :conn-timeout conn-timeout
+                                  :accept :json})]
 
-    (if (= (:status response) 201)
-      (merge {:success true } (json/read-str (:body response) :key-fn keyword))
-      {:success false :code (:status response) :body response}
-      )
+       (if (= (:status response) 201)
+         (merge {:success true } (json/read-str (:body response) :key-fn keyword))
+         {:success false :code (:status response) :body response}
+         )
 
-    )
+       ))
   )
 
-(defn create-subnet [token-id quantum-url network-id cidr start end]
-  (let [response (client/post (str quantum-url "v2.0/subnets")
-                              {
-                               :body (json/write-str {:subnet
-                                                      {:network_id network-id
-                                                       :ip_version 4
-                                                       :cidr cidr
-                                                       :allocation_pools [{:start start :end end}]
-                                                       }
-                                                      })
-                               :headers {"X-Auth-Token" token-id}
-                               :content-type :json
-                               :socket-timeout socket-timeout
-                               :conn-timeout conn-timeout
-                               :accept :json})]
+(defn create-subnet
+ ([{:keys  [token-id quantum-url network-id cidr start end]}]
+     (create-subnet token-id quantum-url network-id cidr start end))
+  ([token-id quantum-url network-id cidr start end]
+     (let [response (client/post (str quantum-url "v2.0/subnets")
+                                                   {
+                                                    :body (json/write-str {:subnet
+                                                                           {:network_id network-id
+                                                                            :ip_version 4
+                                                                            :cidr cidr
+                                                                            :allocation_pools [{:start start :end end}]
+                                                                            }
+                                                                           })
+                                                    :headers {"X-Auth-Token" token-id}
+                                                    :content-type :json
+                                                    :socket-timeout socket-timeout
+                                                    :conn-timeout conn-timeout
+                                                    :accept :json
+                                                    :throw-entire-message? true})]
 
-    (if (= (:status response) 201)
-      (merge {:success true } (json/read-str (:body response) :key-fn keyword))
-      {:success false :code (:status response) :body response}
-      )
+                         (if (= (:status response) 201)
+                           (merge {:success true } (json/read-str (:body response) :key-fn keyword))
+                           {:success false :code (:status response) :body response}
+                           )
 
-    )
+                         ))
   )
 
 (comment "example operation  :compute :images of _tenant_selected"
