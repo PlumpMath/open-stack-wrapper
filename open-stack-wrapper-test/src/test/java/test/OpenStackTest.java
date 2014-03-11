@@ -68,20 +68,20 @@ public class OpenStackTest {
 
                 String flavorLink=((JSONObject)flavorSelected.getJSONArray("links").get(0)).getString("href");
 		System.out.println( flavorLink);
-                /*
+
                 //JSONObject createNetworkResponse=OpenStackAPI.createNetwork(createJSONCreateNetworkObject(epsToken, urlQuantum, "my-network-name"));
 		//System.out.println("create network!!!");
 		//System.out.println(createNetworkResponse);
 
 
-		JSONObject serviceCallNetworks=OpenStackAPI.serviceCall(createJSONServiceCallObject(epsToken, urlQuantum, "v2.0/networks"));
+		JSONObject serviceCallNetworks=OpenStackAPI.makeCall(createJSONServiceCallObject(epsToken, urlQuantum).put("action", "list-networks"));
 		System.out.println("service call:networks");
 		System.out.println(serviceCallNetworks);
                 String networkId=((JSONObject)serviceCallNetworks.getJSONArray("networks").get(0)).getString("id");
 
 		System.out.println("first network id");
 		System.out.println(networkId);
-
+                /*
                 JSONObject createSubnetResponse=OpenStackAPI.createSubnet(createJSONCreateSubnetObject(epsToken, urlQuantum,networkId, "192.168.198.0/24","192.168.198.40", "192.168.198.50"  ));
 		System.out.println(createSubnetResponse);
 
