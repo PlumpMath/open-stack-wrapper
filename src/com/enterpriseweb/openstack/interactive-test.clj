@@ -23,7 +23,7 @@
   (def -tenants-response *1)
 
   (-makeCall (-> (create-java-json login-properties :url :password :username)
-                  (assoc+ :tenant-name (get-in+ -tenants-response [:tenants 0 :name]))
+                  (assoc+ :tenant-name "admin" #_(get-in+ -tenants-response [:tenants 0 :name]))
                   (assoc+ :action :endpoints)))
 
   (def -endpoints-response  *1)
@@ -88,7 +88,7 @@
                   {:token-id new-token-id
                    :quantum-url (get-in endpoints-structured [:network :publicURL])
                    :network-id (get-in+ networks-response [:networks 0 :id])
-                   :cidr "192.168.198.0/24"
+                   :cidr "192.168.1.0/24" #_"192.168.198.0/24"
                    :start "192.168.198.40"
                    :end "192.168.198.50"
                    :action :create-subnet

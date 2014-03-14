@@ -11,7 +11,7 @@
   (letfn  []
 
     (condp = option
-      :tokens os-core/tokens nil :url :username :password
+      :tokens [ os-core/tokens nil :url :username :password]
       :tenants [os-core/tenants nil :token-id :url]
       :endpoints [os-core/endpoints-adaptated nil  :url :username :password :tenant-name]
       :list-images [os-core/service-call
