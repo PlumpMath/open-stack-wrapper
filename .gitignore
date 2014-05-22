@@ -4,10 +4,6 @@
 /pom.xml
 /.env
 login.properties
-open-stack-wrapper-test/src/test/java/test/login.properties
-open-stack-wrapper-test/bin
-open-stack-wrapper-test/target
-open-stack-wrapper-test/test-output
 pom.xml
 pom.xml.asc
 *.jar
