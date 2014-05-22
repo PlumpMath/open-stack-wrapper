@@ -1,12 +1,10 @@
-(ns open-stack-wrapper.core-test
-  (:require [clojure.test :refer :all]
-            [open-stack-wrapper.core :refer :all]))
+(ns com.enterpriseweb.openstack.wrapper.core-test
+  (:require [com.enterpriseweb.openstack.wrapper.core :refer :all]
+            [midje.sweet :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 1 1))))
-
-
+(facts ""
+       (fact ""
+             1 => 1))
 (comment
          (def login-properties (load-config "./login.properties"))
          (def username (:username login-properties))

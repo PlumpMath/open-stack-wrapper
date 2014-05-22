@@ -1,4 +1,4 @@
-(ns open-stack-wrapper.util
+(ns com.enterpriseweb.openstack.wrapper.util
   (:use [clojure.pprint])
   (:require [clj-http.client :as client]
             [clojure.data.json :as json]
@@ -14,8 +14,7 @@
 (defn pprint-json-scheme
   "this fn analyze the json structure thinking that in vectors the elements repeat the same scheme,
    that's to say the elements of the vectors are of the same 'class' from an OO point of view.
-   But not the same prediction on maps where each element have his identity(class) on the map, that's the point of the dictionary elements they are (class)    definitions
-"
+   But not the same prediction on maps where each element have his identity(class) on the map, that's the point of the dictionary elements they are (class)    definitions"
   [the-json-data]
   (let [keywordize (fn [v]
                      (let [s (.getSimpleName (type v))
@@ -36,10 +35,6 @@
                                           :else [json-key (keywordize json-value)])) jsondata)))
               (vector? jsondata)[(deep-read (first jsondata))]
               :else (keywordize jsondata)))
-        result  (into {}  (deep-read the-json-data))
-        ]
+        result  (into {}  (deep-read the-json-data))]
     (pprint result)
-    result
-    )
-
-  )
+    result))

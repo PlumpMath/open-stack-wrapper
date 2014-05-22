@@ -1,8 +1,7 @@
-(ns open-stack-wrapper.util-test
-  (:require [open-stack-wrapper.util :refer :all]
-    [clojure.test :refer :all]))
-
-
+(ns com.enterpriseweb.openstack.wrapper.util-test
+  (:require [com.enterpriseweb.openstack.wrapper.util :refer :all]
+            [midje.sweet :refer :all]
+            [clojure.test :refer :all]))
 (deftest test-pprint-json-scheme
   (testing "some tries"
     (is (= {:key1 "N",

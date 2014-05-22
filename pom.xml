@@ -4,7 +4,7 @@
   <groupId>com.enterpriseweb</groupId>
   <artifactId>open-stack-wrapper</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.11</version>
+  <version>0.1.12</version>
   <name>open-stack-wrapper</name>
   <description>FIXME: write description</description>
   <url>http://example.com/FIXME</url>
@@ -84,6 +84,11 @@
       <groupId>org.clojure</groupId>
       <artifactId>data.json</artifactId>
       <version>0.2.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.enterpriseweb</groupId>
+      <artifactId>clj-java-json-utils</artifactId>
+      <version>0.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>

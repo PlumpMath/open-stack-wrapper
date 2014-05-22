@@ -1,4 +1,4 @@
-(ns open-stack-wrapper.mock)
+(ns com.enterpriseweb.openstack.wrapper.mock)
 (def endpoints-mock
   {:access {:token
             {:issued_at "2014-01-28T14:09:06.955707", :expires "2014-01-29T14:09:06Z",

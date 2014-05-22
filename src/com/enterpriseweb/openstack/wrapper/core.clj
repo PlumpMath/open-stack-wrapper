@@ -1,11 +1,7 @@
-(ns open-stack-wrapper.core
+(ns com.enterpriseweb.openstack.wrapper.core
   (:require [clj-http.client :as client]
-            [clojure.data.json :as json])
-  (:use
-        [open-stack-wrapper.handler :as handler]
-        [slingshot.slingshot :only [throw+ try+]]
-        )
-  )
+            [clojure.data.json :as json]
+            [com.enterpriseweb.openstack.wrapper.handler :as handler]))
 
 ; definitions
 (def conn-timeout 10000)
