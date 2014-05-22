@@ -10,6 +10,7 @@
   (with-open [r (io/reader filename)]
     (read (java.io.PushbackReader. r))))
 
+
 (defn pprint-json-scheme
   "this fn analyze the json structure thinking that in vectors the elements repeat the same scheme,
    that's to say the elements of the vectors are of the same 'class' from an OO point of view.
@@ -41,12 +42,4 @@
     result
     )
 
-  )
-
-(comment
-  (let [example {:key1 1
-                  :key2 {:key3 "hola" :key4 {}}
-                  :key5 [[{:key6 [{:key7 1}]}]]
-                 }]
-    (pprint-json-scheme example))
   )

@@ -4,7 +4,7 @@
   <groupId>com.enterpriseweb</groupId>
   <artifactId>open-stack-wrapper</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.9</version>
+  <version>0.1.11</version>
   <name>open-stack-wrapper</name>
   <description>FIXME: write description</description>
   <url>http://example.com/FIXME</url>
@@ -107,6 +107,12 @@
           <artifactId>clojure</artifactId>
         </exclusion>
       </exclusions>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>midje</groupId>
+      <artifactId>midje</artifactId>
+      <version>1.6.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

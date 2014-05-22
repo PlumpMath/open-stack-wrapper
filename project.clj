@@ -1,4 +1,4 @@
-(defproject com.enterpriseweb/open-stack-wrapper "0.1.9"
+(defproject com.enterpriseweb/open-stack-wrapper "0.1.11"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -7,9 +7,13 @@
                  [clj-http "0.7.8"]
                  [slingshot "0.10.3"]
                  [org.json/json "20131018"]
-                 [org.clojure/data.json "0.2.4"]]
+                 [org.clojure/data.json "0.2.4"]
+]
   :scm {:name "git"
         :url "https://github.com/tangrammer/open-stack-wrapper"}
 
-  :aot [com.enterpriseweb.openstack.OpenStackAPI]
+
+  :profiles {:dev {:dependencies [[midje "1.6.3"]]}}
+
+
   )
