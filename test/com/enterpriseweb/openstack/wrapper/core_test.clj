@@ -1,5 +1,6 @@
 (ns com.enterpriseweb.openstack.wrapper.core-test
   (:require [com.enterpriseweb.openstack.wrapper.core :refer :all]
+            [com.enterpriseweb.openstack.wrapper.util :refer (load-config)]
             [midje.sweet :refer :all]))
 
 (facts ""
@@ -11,7 +12,7 @@
          (def password (:password login-properties))
          (def url (:url login-properties))
 
-         (tokens url "admin" "password" )
+         (tokens url username password)
          (def tokens-response *1)
          (def token-id (get-in tokens-response [:access :token :id]))
          (tenants url  token-id )

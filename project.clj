@@ -8,6 +8,7 @@
                  [slingshot "0.10.3"]
                  [org.json/json "20131018"]
                  [org.clojure/data.json "0.2.4"]
+                 [midje "1.6.3"]
                  [com.enterpriseweb/clj-java-json-utils "0.1.0"]]
 
   :scm {:name "git"
