@@ -3,12 +3,14 @@
             [clojure.data.json :as json]
             [com.enterpriseweb.openstack.wrapper.handler :as handler]))
 
-; definitions
+;;;
+;;; definitions
+;;;
 (def conn-timeout 10000)
-
 (def socket-timeout 10000)
-
-; utilities
+;;;
+;;; utilities
+;;;
 (defn structured-endpoints [data]
   "in this development state we take the first endpoint available on each service"
   (let [services (get-in data [:access :serviceCatalog])]
@@ -22,8 +24,9 @@
      {}
      services)))
 
-; api calls
-
+;;;
+;;; api calls
+;;;
 (defn tokens
   ([{:keys [url username password]}]
    (tokens url username password))
@@ -51,18 +54,20 @@
                                       :accept :json
                                       :throw-entire-message? true}))))
 
-
 (defn endpoints [url username password tenant-name]
-  (handler/adapt-call (client/post (str url "/v2.0/tokens")
-                                   {
-                                    :body (json/write-str {:auth  {:passwordCredentials {:username username
-                                                                                         :password password}
-                                                                   :tenantName tenant-name}})
-                                    :content-type :json
-                                    :socket-timeout socket-timeout
-                                    :conn-timeout conn-timeout
-                                    :accept :json
-                                    :throw-entire-message? true})))
+  (handler/adapt-call
+   (client/post
+    (str url "/v2.0/tokens")
+                {:body (json/write-str {:auth
+                                        {:passwordCredentials
+                                         {:username username
+                                          :password password}
+                                         :tenantName tenant-name}})
+                 :content-type :json
+                 :socket-timeout socket-timeout
+                 :conn-timeout conn-timeout
+                 :accept :json
+                 :throw-entire-message? true})))
 
 (defn endpoints-adaptated
   [{:keys  [url username password tenant-name]}]
@@ -78,7 +83,6 @@
      :eps adapted-local-url-eps}
 
     ))
-
 
 (defn delete
   ([{:keys  [eps-token-id url ]}]
@@ -97,7 +101,6 @@
       ))
   )
 
-
 (defn service-call
   ([{:keys  [eps-token-id url path]}]
      (service-call eps-token-id url path))
@@ -112,8 +115,6 @@
                                         :accept :json
                                         :throw-entire-message? true}))))
   )
-
-
 
 (defn create-server
   ([{:keys  [token-id nova-url server-name flavor-href image-href network-id ]}]

@@ -14,8 +14,4 @@
   :scm {:name "git"
         :url "https://github.com/tangrammer/open-stack-wrapper"}
 
-
-  :profiles {:dev {:dependencies [[midje "1.6.3"]]}}
-
-
-  )
+  :profiles {:dev {:dependencies [[midje "1.6.3"]]}})
