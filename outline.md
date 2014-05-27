@@ -1,4 +1,11 @@
-openstack sequence
+architecture pieces
+open-stack-rest-api
+clj-http [A Clojure HTTP library wrapping the Apache HttpComponents client.]
+org.json [json in java]
+data.json [JSON parser/generator to/from Clojure data structures. Follows the specification on http://json.org/]
+
+
+openstack use cases
 
 -> tokens [url username pasword]
 <- json-tokens
